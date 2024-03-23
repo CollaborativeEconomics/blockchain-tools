@@ -1,8 +1,8 @@
 import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
 
 export const mainnetConfig = {
-  id: {BLOCKCHAIN_ID},
-  name: 'Mainnet',
+  id: {TESTNET_BLOCKCHAIN_ID},
+  name: 'Blockchain Mainnet',
   symbol: '{MAINNET_SYMBOL}',
   decimals: {MAINNET_DECIMALS},
   gasprice: '{MAINNET_GASPRICE}',
@@ -12,8 +12,8 @@ export const mainnetConfig = {
 };
 
 export const testnetConfig = {
-  id: {BLOCKCHAIN_ID},
-  name: 'Testnet',
+  id: {TESTNET_BLOCKCHAIN_ID},
+  name: 'Blockchain Testnet',
   symbol: '{TESTNET_SYMBOL}',
   decimals: {TESTNET_DECIMALS},
   gasprice: '{TESTNET_GASPRICE}',
@@ -22,18 +22,14 @@ export const testnetConfig = {
   wssurl: '{TESTNET_WSS_URL}'
 };
 
-interface BlockchainOptions {
-  network?: 'mainnet' | 'testnet'
-}
-
 class Blockchain extends ChainInstance {
-  chain: Chain = '{BLOCKCHAIN_CHAIN}';
+  chain: Chain = 'Blockchain';
   symbol: ChainSymbol = '{BLOCKCHAIN_SYMBOL}';
   logo = '{BLOCKCHAIN_LOGO_URL}';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 
-  constructor({ network = 'mainnet' } = {} as BlockchainOptions) {
+  constructor({ network }) {
     super();
     this.network = network;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
@@ -55,7 +51,7 @@ class Blockchain extends ChainInstance {
     {TO_BASE_UNIT_FUNCTION}
   }
 
-  async fetchLedger(method: string, params: unknown): Promise<unknown> {
+  async fetchLedger(method: string, params: unknown) {
     {FETCH_LEDGER_FUNCTION}
   }
 

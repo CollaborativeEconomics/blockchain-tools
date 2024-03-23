@@ -45,7 +45,7 @@ rl.question('Enter the name of the chain (e.g., Xrpl): ', async chainName => {
         });
       });
 
-      content = content.replace(placeholder, replacement);
+      content = content.replace(placeholder, replacement ?? '');
     }
 
     // Change the file extension to .ts

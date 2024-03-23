@@ -18,7 +18,7 @@ class StellarClass{
     symbol: 'XLM',
     decimals: 6,
     gasprice: '250000000',
-    explorer: '',
+    explorer: 'https://stellarchain.io',
     rpcurl: 'https://horizon.stellar.org',
     wssurl: ''
   }
@@ -28,7 +28,7 @@ class StellarClass{
     symbol: 'XLM',
     decimals: 6,
     gasprice: '250000000',
-    explorer: '',
+    explorer: 'https://testnet.stellarchain.io',
     rpcurl: 'https://horizon-testnet.stellar.org',
     wssurl: ''
   }

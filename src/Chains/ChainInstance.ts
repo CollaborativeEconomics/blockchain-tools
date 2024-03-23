@@ -25,7 +25,7 @@ export default abstract class ChainInstance {
   public abstract chain: Chain
   public abstract symbol: ChainSymbol
   public abstract logo: string
-  public network: 'mainnet' | 'testnet' = 'mainnet'
+  public network: 'mainnet' | 'testnet' | string = 'mainnet'
   public provider: NetworkProvider
   public abstract mainnet: NetworkProvider
   public abstract testnet: NetworkProvider

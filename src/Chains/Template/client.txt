@@ -1,6 +1,6 @@
 'use client';
 
-import {Wallet} from "wallet-library"; // TODO: Placeholder for actual wallet import
+import { Wallet } from "wallet-library"; // TODO: Placeholder for actual wallet import
 import Blockchain from "./common";
 
 type Dictionary = { [key: string]: any };
