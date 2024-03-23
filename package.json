@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "addChain": "node src/utils/createChainFromTemplate.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,10 @@
   "homepage": "https://github.com/CollaborativeEconomics/blockchain-tools#readme",
   "devDependencies": {
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "web3": "^4.6.0",
+    "xumm": "^1.7.7",
+    "xumm-sdk": "^1.11.1"
   }
 }

@@ -1,0 +1,69 @@
+import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
+
+export const mainnetConfig = {
+  id: {BLOCKCHAIN_ID},
+  name: 'Mainnet',
+  symbol: '{MAINNET_SYMBOL}',
+  decimals: {MAINNET_DECIMALS},
+  gasprice: '{MAINNET_GASPRICE}',
+  explorer: '{MAINNET_EXPLORER_URL}',
+  rpcurl: '{MAINNET_RPC_URL}',
+  wssurl: '{MAINNET_WSS_URL}'
+};
+
+export const testnetConfig = {
+  id: {BLOCKCHAIN_ID},
+  name: 'Testnet',
+  symbol: '{TESTNET_SYMBOL}',
+  decimals: {TESTNET_DECIMALS},
+  gasprice: '{TESTNET_GASPRICE}',
+  explorer: '{TESTNET_EXPLORER_URL}',
+  rpcurl: '{TESTNET_RPC_URL}',
+  wssurl: '{TESTNET_WSS_URL}'
+};
+
+interface BlockchainOptions {
+  network?: 'mainnet' | 'testnet'
+}
+
+class Blockchain extends ChainInstance {
+  chain: Chain = '{BLOCKCHAIN_CHAIN}';
+  symbol: ChainSymbol = '{BLOCKCHAIN_SYMBOL}';
+  logo = '{BLOCKCHAIN_LOGO_URL}';
+  mainnet = mainnetConfig;
+  testnet = testnetConfig;
+
+  constructor({ network = 'mainnet' } = {} as BlockchainOptions) {
+    super();
+    this.network = network;
+    this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
+  }
+
+  async getTransactionInfo(txid: string): Promise<unknown> {
+    {GET_TRANSACTION_INFO_FUNCTION}
+  }
+
+  findOffer(txInfo: any): unknown {
+    {FIND_OFFER_FUNCTION}
+  }
+
+  fromBaseUnit(amount: number): number {
+    {FROM_BASE_UNIT_FUNCTION}
+  }
+
+  toBaseUnit(amount: number): number {
+    {TO_BASE_UNIT_FUNCTION}
+  }
+
+  async fetchLedger(method: string, params: unknown): Promise<unknown> {
+    {FETCH_LEDGER_FUNCTION}
+  }
+
+  findToken(tokenId: string): unknown {
+    {FIND_TOKEN_FUNCTION}
+  }
+
+  // TODO: Additional common methods specific to this blockchain
+};
+
+export default Blockchain;

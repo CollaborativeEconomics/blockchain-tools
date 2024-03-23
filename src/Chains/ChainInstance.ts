@@ -1,3 +1,5 @@
+import { Web3 } from 'web3'
+
 export const chains = {
   AVAX: 'Avalanche',
   BNB: 'Binance',
@@ -18,26 +20,15 @@ export const chains = {
 export type Chain = typeof chains[keyof typeof chains];
 export type ChainSymbol = keyof typeof chains;
 
-interface NetworkConfig {
-  id: number;
-  name: string;
-  symbol: string;
-  decimals: number;
-  gasprice: string;
-  explorer: string;
-  rpcurl: string;
-  wssurl: string;
-}
-
 export default abstract class ChainInstance {
   // config
   public abstract chain: Chain
   public abstract symbol: ChainSymbol
   public abstract logo: string
-  public abstract network: string
-  public abstract provider?: NetworkConfig
-  public abstract mainnet: NetworkConfig
-  public abstract testnet: NetworkConfig
+  public network: 'mainnet' | 'testnet' = 'mainnet'
+  public provider: NetworkProvider
+  public abstract mainnet: NetworkProvider
+  public abstract testnet: NetworkProvider
   public wallet: any = null; // TODO: enumerate wallet classes, then type this
 
   // isometric functions, must be defined on all subclasses
@@ -53,6 +44,9 @@ export default abstract class ChainInstance {
   public sendPayment?(address: string, amount: number, destinTag: string, callback: (status: unknown) => void): void { };
 
   // server functions, only defined on server subclasses
-  public async mintNFT?(uri: string, donor: string, taxon: number, transfer: boolean): Promise<unknown> { return null };
+  public web3?: Web3;
+  walletSeed?: string; // For minting NFTs and such
+  public async mintNFT?(uri: string, donor: string, taxon: number, transfer: boolean, contract: string): Promise<unknown> { return null };
+  public async mintNFT1155?(address: string, tokenId: string, uri: string, contract: string): Promise<unknown> { return null };
   public async createSellOffer?(tokenId: string, destinationAddress: string, offerExpirationDate?: string): Promise<unknown> { return null };
 }

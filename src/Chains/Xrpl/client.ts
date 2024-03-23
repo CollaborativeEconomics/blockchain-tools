@@ -1,7 +1,7 @@
 'use client';
 
 import { Xumm } from "xumm";
-import Ripple from "./Ripple";
+import Ripple from "./common";
 import type { XummJsonTransaction, XummPostPayloadBodyJson, PayloadAndSubscription } from 'xumm-sdk/dist/src/types'
 
 

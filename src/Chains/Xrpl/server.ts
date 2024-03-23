@@ -1,4 +1,4 @@
-import Ripple from "./Ripple";
+import Ripple from "./common";
 import { Client, NFTokenCreateOffer, NFTokenCreateOfferFlags, NFTokenMintFlags, Wallet, convertStringToHex, isoTimeToRippleTime } from "xrpl";
 
 class RippleServer extends Ripple {

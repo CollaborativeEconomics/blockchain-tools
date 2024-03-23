@@ -1,0 +1,21 @@
+import Blockchain from "./common";
+
+class BlockchainServer extends Blockchain {
+  
+  async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
+    console.log('Minting NFT...', uri, donor);
+    // TODO: Implementation for minting NFT
+    throw new Error("mintNFT method not implemented.");
+  }
+
+  async createSellOffer(tokenId: string, destinationAddress: string, offerExpirationDate?: string) {
+    console.log('Creating sell offer', tokenId, destinationAddress);
+    // TODO: Implementation for creating a sell offer
+    throw new Error("createSellOffer method not implemented.");
+  }
+
+  // TODO: Additional server-specific methods
+}
+
+const BlockchainServerInstance = new BlockchainServer();
+export default BlockchainServerInstance;
