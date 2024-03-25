@@ -1,9 +1,18 @@
+import Web3 from "web3";
 import Blockchain from "./common";
 
 class BlockchainServer extends Blockchain {
+  web3: Web3
+
+  constructor({ network } = { network: 'mainnet' }) {
+    super()
+    this.network = network
+    this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
+    this.web3 = new Web3(this.provider.rpcurl)
+  }
   
-  async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
-    console.log('Minting NFT...', uri, donor);
+  async mintNFT(uri: string, address: string, taxon: number, transfer: boolean = false) {
+    console.log('Minting NFT...', uri, address);
     // TODO: Implementation for minting NFT
     throw new Error("mintNFT method not implemented.");
   }

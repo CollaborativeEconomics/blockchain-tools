@@ -1,8 +1,7 @@
 import Web3 from "web3";
-import Abi721 from "@/Contracts/erc721-abi.json";
-import Binance from "./common";
+import Flare from "./common";
 
-class BinanceServer extends Binance {
+class FlareServer extends Flare {
   web3: Web3
 
   constructor({ network } = { network: 'mainnet' }) {
@@ -12,12 +11,12 @@ class BinanceServer extends Binance {
     this.web3 = new Web3(this.provider.rpcurl)
   }
 
-  async mintNFT(uri: string, address: string) {
+  async mintNFT(uri: string, address: string, taxon: number, transfer: boolean = false) {
     console.log(this.chain, 'server minting NFT to', address, uri)
-    const secret = process.env.BINANCE_MINTER_WALLET_SEED || ''
+    const secret = process.env.FLARE_MINTER_WALLET_SEED || ''
     const acct = this.web3.eth.accounts.privateKeyToAccount(secret)
     const minter = acct.address
-    const contract = process.env.NEXT_PUBLIC_BINANCE_MINTER_CONTRACT || ''
+    const contract = process.env.NEXT_PUBLIC_FLARE_MINTER_CONTRACT || ''
     const instance = new this.web3.eth.Contract(Abi721, contract)
     const noncex = await this.web3.eth.getTransactionCount(minter, 'latest')
     const nonce = Number(noncex)
@@ -70,8 +69,8 @@ class BinanceServer extends Binance {
   async sendPayment(address: string, amount: number, destinTag: string, callback: any) {
     console.log('BNB Sending payment...')
     const value = this.toBaseUnit(amount)
-    const secret = process.env.BINANCE_MINTER_WALLET_SEED || ''
-    //const source = process.env.BINANCE_MINTER_WALLET
+    const secret = process.env.FLARE_MINTER_WALLET_SEED || ''
+    //const source = process.env.FLARE_MINTER_WALLET
     const acct = this.web3.eth.accounts.privateKeyToAccount(secret)
     const source = acct.address
     const nonce = await this.web3.eth.getTransactionCount(source, 'latest')
@@ -91,5 +90,5 @@ class BinanceServer extends Binance {
   }
 }
 
-const BinanceServerInstance = new BinanceServer();
-export default BinanceServerInstance;
+const FlareServerInstance = new FlareServer();
+export default FlareServerInstance;

@@ -3,7 +3,7 @@
 import Blockchain from "./common";
 
 class BlockchainClient extends Blockchain {
-  constructor({ network }: { network: BlockchainNetworks } = { network: 'mainnet' }) {
+  constructor({ network } = { network: 'mainnet' }) {
     super();
     this.network = network;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;

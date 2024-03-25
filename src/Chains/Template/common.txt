@@ -1,7 +1,7 @@
 import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
 
 export const mainnetConfig = {
-  id: {TESTNET_BLOCKCHAIN_ID},
+  id: {MAINNET_BLOCKCHAIN_ID},
   name: 'Blockchain Mainnet',
   symbol: '{MAINNET_SYMBOL}',
   decimals: {MAINNET_DECIMALS},
