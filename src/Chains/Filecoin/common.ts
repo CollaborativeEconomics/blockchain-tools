@@ -44,7 +44,7 @@ export const filecoinNetworks = {
 class Filecoin extends ChainInstance {
   chain: Chain = 'Filecoin';
   symbol: ChainSymbol = 'FIL';
-  logo = 'fil.png';
+  logo = 'fil.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

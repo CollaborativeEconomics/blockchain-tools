@@ -25,7 +25,7 @@ export const testnetConfig = {
 class Ethereum extends ChainInstance {
   chain: Chain = 'Ethereum';
   symbol: ChainSymbol = 'ETH';
-  logo = 'eth.png';
+  logo = 'eth.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

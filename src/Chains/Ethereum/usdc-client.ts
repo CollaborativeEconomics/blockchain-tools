@@ -10,7 +10,7 @@ class EthereumUSDCClient extends EthereumClient {
   contract: string
   chain = 'EthereumUSDC' as Chain
   symbol = 'USDC' as ChainSymbol
-  logo = 'usdc.png'
+  logo = 'usdc.svg'
   mainnet = {
     id: 1,
     name: 'Ethereum USDC Mainnet',

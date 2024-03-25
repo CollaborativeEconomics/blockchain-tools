@@ -8,7 +8,7 @@ class BaseSDK{
   enabled  = true
   chain    = 'Base'
   symbol   = 'BASE'
-  logo     = 'base.png'
+  logo     = 'base.svg'
   network  = process.env.NEXT_PUBLIC_BASE_NETWORK || ''
   provider:WalletProvider
   mainnet  = {

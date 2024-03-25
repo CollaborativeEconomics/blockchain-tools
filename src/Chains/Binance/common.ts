@@ -25,7 +25,7 @@ export const testnetConfig = {
 class Binance extends ChainInstance {
   chain: Chain = 'Binance';
   symbol: ChainSymbol = 'BNB';
-  logo = 'bnb.png';
+  logo = 'bnb.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

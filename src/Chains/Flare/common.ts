@@ -25,7 +25,7 @@ export const testnetConfig = {
 class Flare extends ChainInstance {
   chain: Chain = 'Flare';
   symbol: ChainSymbol = 'FLR';
-  logo = 'flr.png';
+  logo = 'flr.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

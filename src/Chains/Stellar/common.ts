@@ -47,7 +47,7 @@ class Stellar extends ChainInstance {
   network: StellarNetworks;
   chain: Chain = 'Stellar';
   symbol: ChainSymbol = 'XLM';
-  logo = 'xlm.png';
+  logo = 'xlm.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
   futurenet = futurenetConfig;

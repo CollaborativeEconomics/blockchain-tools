@@ -29,7 +29,7 @@ interface XinFinOptions {
 class XinFin extends ChainInstance {
   chain: Chain = 'XinFin';
   symbol: ChainSymbol = 'XDC';
-  logo = 'xdc.png';
+  logo = 'xdc.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

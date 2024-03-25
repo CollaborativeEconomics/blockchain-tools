@@ -25,7 +25,7 @@ export const testnetConfig = {
 class EOS extends ChainInstance {
   chain: Chain = 'EOS';
   symbol: ChainSymbol = 'EOS';
-  logo = 'eos.png';
+  logo = 'eos.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

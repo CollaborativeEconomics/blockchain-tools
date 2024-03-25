@@ -3,6 +3,7 @@ import { Web3 } from 'web3'
 
 export const chains = {
   AVAX: 'Avalanche',
+  ARB: 'Arbitrum',
   BNB: 'Binance',
   CELO: 'Celo',
   EOS: 'EOS',

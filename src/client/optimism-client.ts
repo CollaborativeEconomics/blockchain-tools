@@ -8,7 +8,7 @@ class OptimismSDK{
   enabled  = true
   chain    = 'Optimism'
   symbol   = 'OP'
-  logo     = 'op.png'
+  logo     = 'op.svg'
   network  = process.env.NEXT_PUBLIC_OPTIMISM_NETWORK || ''
   provider:WalletProvider
   mainnet  = {

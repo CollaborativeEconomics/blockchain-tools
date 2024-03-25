@@ -25,7 +25,7 @@ export const testnetConfig = {
 class Polygon extends ChainInstance {
   chain: Chain = 'Polygon';
   symbol: ChainSymbol = 'MATIC';
-  logo = 'matic.png';
+  logo = 'matic.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 

@@ -27,7 +27,7 @@ export const avalancheTestnet = {
 export default class Avalanche extends ChainInstance {
   chain: Chain = 'Avalanche'
   symbol: ChainSymbol = 'AVAX'
-  logo = 'avax.png'
+  logo = 'avax.svg'
   network = process.env.NEXT_PUBLIC_AVALANCHE_NETWORK!
   provider = avalancheTestnet
   mainnet = avalancheMainnet

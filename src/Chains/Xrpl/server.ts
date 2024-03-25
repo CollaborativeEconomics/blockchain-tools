@@ -113,7 +113,7 @@ class XrplServer extends Xrpl {
       // @ts-ignore: I hate types
       console.log('Payload URL:', payload?.created.next.always)
       // @ts-ignore: I hate types
-      console.log('Payload QR:', payload?.created.refs.qr_png)
+      console.log('Payload QR:', payload?.created.refs.qr.svg)
       // @ts-ignore: I hate types
       return payload.resolved // Return payload promise for the next `then`
     }).then((payload) => {

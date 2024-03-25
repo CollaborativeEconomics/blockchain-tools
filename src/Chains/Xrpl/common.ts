@@ -28,7 +28,7 @@ export const testnetConfig = {
 class Xrpl extends ChainInstance {
   chain: Chain = 'XRPL';
   symbol: ChainSymbol = 'XRP';
-  logo = 'xrp.png';
+  logo = 'xrp.svg';
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 
