@@ -43,6 +43,7 @@ export default abstract class ChainInstance {
   // server functions, only defined on server subclasses
   public web3?: Web3;
   walletSeed?: string; // For minting NFTs and such
+  contract?: string; // For minting NFTs and such
   public async mintNFT?(uri: string, donor: string, taxon: number, transfer: boolean, contract: string): Promise<unknown> { return null };
   public async mintNFT1155?(address: string, tokenId: string, uri: string, contract: string): Promise<unknown> { return null };
   public async createSellOffer?(tokenId: string, destinationAddress: string, offerExpirationDate?: string): Promise<unknown> { return null };
