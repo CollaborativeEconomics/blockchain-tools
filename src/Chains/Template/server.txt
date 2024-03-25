@@ -1,12 +1,17 @@
 import Web3 from "web3";
+import Abi721 from "@/Contracts/erc721-abi.json";
 import Blockchain from "./common";
 
 class BlockchainServer extends Blockchain {
   web3: Web3
+  contract: string;
+  walletSeed: string;
 
-  constructor({ network } = { network: 'mainnet' }) {
+  constructor({ network, contract, walletSeed } = { network: 'mainnet', contract: '', walletSeed: '' }) {
     super()
     this.network = network
+    this.contract = contract;
+    this.walletSeed = walletSeed;
     this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
     this.web3 = new Web3(this.provider.rpcurl)
   }
