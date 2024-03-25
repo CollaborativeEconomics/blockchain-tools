@@ -39,8 +39,6 @@ class OptimismClient extends Optimism {
       callback(result)
     })
   }
-
-  // TODO: Additional client-specific methods
 }
 
 export default OptimismClient;

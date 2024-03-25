@@ -25,6 +25,8 @@ export const testnetConfig = {
   wssurl: 'wss://s.altnet.rippletest.net:51233'
 };
 
+type transactionMethods = 'tx' | 'submit' | 'submit_multisigned' | 'transaction_entry' | 'tx_history'
+
 class Xrpl extends ChainInstance {
   chain: Chain = 'XRPL';
   symbol: ChainSymbol = 'XRP';
@@ -40,7 +42,7 @@ class Xrpl extends ChainInstance {
 
   async getTransactionInfo(txid: string): Promise<unknown> {
     console.log('Get tx info by txid', txid)
-    const txResponse = await this.fetchLedger('POST', { method: 'tx', params: [{ transaction: txid, binary: false }] })
+    const txResponse = await this.fetchLedger('tx', { transaction: txid, binary: false })
     if (!txResponse || 'error' in txResponse) {
       console.log('ERROR: Exception occured while retrieving transaction info', txid)
       return { error: 'Exception occured while retrieving transaction info' }
@@ -72,10 +74,15 @@ class Xrpl extends ChainInstance {
     }
   }
 
-  async fetchLedger(method: string, params: unknown) {
+  async fetchLedger(method: transactionMethods, params: Record<string, unknown>) {
     try {
       let url = this.provider.rpcurl
-      let options = { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params) }
+      let options = {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+          method,
+          params: [params]
+        })
+      }
       let result = await fetch(url, options)
       let data = await result.json()
       return data

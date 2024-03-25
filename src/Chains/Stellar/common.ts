@@ -60,7 +60,7 @@ class Stellar extends ChainInstance {
 
   async getTransactionInfo(txid: string): Promise<unknown> {
     console.log('Get tx info by txid', txid);
-    let txInfo = await this.fetchLedger('GET', '/transactions/' + txid)
+    let txInfo = await this.fetchLedger('/transactions/' + txid)
     if (!txInfo || 'error' in txInfo) {
       console.log('ERROR', 'Transaction not found:', txid)
       return { error: 'Transaction not found' }
@@ -72,7 +72,7 @@ class Stellar extends ChainInstance {
     console.log('TXINFO', txInfo)
     const tag = txInfo.memo?.indexOf(':') > 0 ? txInfo.memo?.split(':')[1] : ''
     const opid = (BigInt(txInfo.paging_token) + BigInt(1)).toString()
-    const opInfo = await this.fetchLedger('GET', '/operations/' + opid)
+    const opInfo = await this.fetchLedger('/operations/' + opid)
     const result = {
       success: true,
       account: txInfo.source_account,
@@ -87,7 +87,7 @@ class Stellar extends ChainInstance {
     throw new Error("FIND_OFFER_ method not yet implemented.");
   }
 
-  async fetchLedger(method: string, query: string) {
+  async fetchLedger(query: string) {
     try {
       let url = this.provider.rpcurl + query
       console.log('FETCH', url)
