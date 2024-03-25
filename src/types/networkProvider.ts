@@ -1,4 +1,4 @@
-interface NetworkProvider {
+export interface NetworkProvider {
   id: number;
   name: string;
   symbol: string;

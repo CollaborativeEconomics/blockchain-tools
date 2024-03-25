@@ -1,4 +1,5 @@
-import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
+import ChainInstance, { Chain, ChainSymbol } from "@/Chains/ChainInstance";
+import { NetworkProvider } from "@/types/networkProvider";
 
 export const mainnetConfig = {
   id: 0,
@@ -27,6 +28,7 @@ export const futurenetConfig = {
   name: 'Stellar Futurenet',
   symbol: 'XLM',
   decimals: 6,
+  gasprice: '250000000', // TODO: is this right? I copy-pasted from testnet
   explorer: '',
   rpcurl: 'https://horizon-futurenet.stellar.org',
   soroban: 'https://rpc-futurenet.stellar.org',
@@ -34,14 +36,15 @@ export const futurenetConfig = {
   wssurl: ''
 }
 
-const networkMap = {
+type StellarNetworks = 'mainnet' | 'testnet' | 'futurenet'
+const networkMap: Record<StellarNetworks, NetworkProvider> = {
   mainnet: mainnetConfig,
   testnet: testnetConfig,
   futurenet: futurenetConfig
 }
 
 class Stellar extends ChainInstance {
-  network: 'mainnet' | 'testnet' | 'futurenet' = 'mainnet';
+  network: StellarNetworks;
   chain: Chain = 'Stellar';
   symbol: ChainSymbol = 'XLM';
   logo = 'xlm.png';
@@ -49,7 +52,7 @@ class Stellar extends ChainInstance {
   testnet = testnetConfig;
   futurenet = futurenetConfig;
 
-  constructor({ network }) {
+  constructor({ network }: { network: StellarNetworks } = { network: 'mainnet' }) {
     super();
     this.network = network;
     this.provider = networkMap[network];

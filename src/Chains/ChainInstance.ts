@@ -1,3 +1,4 @@
+import { NetworkProvider } from '@/types/networkProvider';
 import { Web3 } from 'web3'
 
 export const chains = {
@@ -26,7 +27,7 @@ export default abstract class ChainInstance {
   public abstract symbol: ChainSymbol
   public abstract logo: string
   public network: 'mainnet' | 'testnet' | string = 'mainnet'
-  public provider: NetworkProvider
+  public provider: NetworkProvider = { id: 0, name: '', symbol: '', decimals: 0, gasprice: '', explorer: '', rpcurl: '', wssurl: '' }
   public abstract mainnet: NetworkProvider
   public abstract testnet: NetworkProvider
   public wallet: any = null; // TODO: enumerate wallet classes, then type this
