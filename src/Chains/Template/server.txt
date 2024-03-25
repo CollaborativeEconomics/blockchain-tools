@@ -31,5 +31,4 @@ class BlockchainServer extends Blockchain {
   // TODO: Additional server-specific methods
 }
 
-const BlockchainServerInstance = new BlockchainServer();
-export default BlockchainServerInstance;
+export default BlockchainServer;

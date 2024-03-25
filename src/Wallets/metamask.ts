@@ -329,14 +329,14 @@ export default class Wallet {
     }
   }
 
-  async paytoken(destin: string, amount: string, token: string, contract: string, memo: string) {
+  async paytoken(destin: string, amount: number, token: string, contract: string, memo: string) {
     function numHex(num: number) { return '0x' + (num).toString(16) }
     function strHex(str: string) { return '0x' + Buffer.from(str.toString(), 'utf8').toString('hex') }
     console.log(`Sending ${amount} ${token} token to ${destin}...`)
     const gasPrice = await this.getGasPrice() //numHex(20000000000)
     console.log('GAS', parseInt(gasPrice), gasPrice)
     const gas = numHex(210000)
-    const wei = numHex(parseFloat(amount) * 10 ** 6)  // usdc and usdt only have 6 decs
+    const wei = numHex(amount * 10 ** 6)  // usdc and usdt only have 6 decs
     const method = 'eth_sendTransaction'
     const ctr = new this.web3.eth.Contract(erc20abi, contract)
     const data = ctr.methods.transfer(destin, wei).encodeABI()

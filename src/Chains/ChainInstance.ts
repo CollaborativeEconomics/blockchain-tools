@@ -4,6 +4,7 @@ import { Web3 } from 'web3'
 export const chains = {
   AVAX: 'Avalanche',
   ARB: 'Arbitrum',
+  BASE: 'Base',
   BNB: 'Binance',
   CELO: 'Celo',
   EOS: 'EOS',
@@ -40,6 +41,7 @@ export default abstract class ChainInstance {
   // client functions, only defined on client subclasses
   public connect?(callback: (data: unknown) => void): void { };
   public sendPayment?(address: string, amount: number, destinTag: string, callback: (status: unknown) => void): void { };
+  public async sendToken?(address: string, amount: number, token: string, contract: string, destinTag: string, callback: any): Promise<void> { }
 
   // server functions, only defined on server subclasses
   public web3?: Web3;
