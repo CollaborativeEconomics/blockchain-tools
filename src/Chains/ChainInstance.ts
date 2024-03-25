@@ -34,9 +34,6 @@ export default abstract class ChainInstance {
 
   // isometric functions, must be defined on all subclasses
   public abstract getTransactionInfo(txid: string): unknown;
-  public abstract findOffer(txInfo: any): unknown;
-  public abstract fromBaseUnit(amount: number): number;
-  public abstract toBaseUnit(amount: number): number;
   public abstract fetchLedger(method: unknown, params: unknown): unknown;
 
   // client functions, only defined on client subclasses
@@ -49,4 +46,29 @@ export default abstract class ChainInstance {
   public async mintNFT?(uri: string, donor: string, taxon: number, transfer: boolean, contract: string): Promise<unknown> { return null };
   public async mintNFT1155?(address: string, tokenId: string, uri: string, contract: string): Promise<unknown> { return null };
   public async createSellOffer?(tokenId: string, destinationAddress: string, offerExpirationDate?: string): Promise<unknown> { return null };
+
+  // utility functions
+  fromBaseUnit(amount: number): number {
+    const wei = 10 ** this.provider.decimals
+    return amount / wei
+  }
+
+  toBaseUnit(amount: number): number {
+    const wei = 10 ** this.provider.decimals
+    return amount * wei
+  }
+
+  toHex(str: string) {
+    return '0x' + parseInt(str).toString(16)
+  }
+
+  strToHex(str: string) {
+    if (!str) { return '' }
+    return '0x' + Buffer.from(str.toString(), 'utf8').toString('hex')
+  }
+
+  hexToStr(hex: string, encoding: BufferEncoding = 'utf8') {
+    if (!hex) { return '' }
+    return Buffer.from(hex.substr(2), 'hex').toString(encoding)
+  }
 }

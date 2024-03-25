@@ -72,16 +72,6 @@ class Xrpl extends ChainInstance {
     }
   }
 
-  fromBaseUnit(amount: number): number {
-    const wei = 10 ** this.provider.decimals
-    return amount / wei
-  }
-
-  toBaseUnit(amount: number): number {
-    const wei = 10 ** this.provider.decimals
-    return amount * wei
-  }
-
   async fetchLedger(method: string, params: unknown) {
     try {
       let url = this.provider.rpcurl

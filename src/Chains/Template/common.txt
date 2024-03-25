@@ -39,18 +39,6 @@ class Blockchain extends ChainInstance {
     {GET_TRANSACTION_INFO_FUNCTION}
   }
 
-  findOffer(txInfo: any): unknown {
-    {FIND_OFFER_FUNCTION}
-  }
-
-  fromBaseUnit(amount: number): number {
-    {FROM_BASE_UNIT_FUNCTION}
-  }
-
-  toBaseUnit(amount: number): number {
-    {TO_BASE_UNIT_FUNCTION}
-  }
-
   async fetchLedger(method: string, params: unknown) {
     {FETCH_LEDGER_FUNCTION}
   }

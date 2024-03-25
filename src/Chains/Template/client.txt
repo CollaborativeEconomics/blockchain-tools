@@ -1,16 +1,9 @@
 'use client';
 
-import { Wallet } from "wallet-library"; // TODO: Placeholder for actual wallet import
 import Blockchain from "./common";
 
-type Dictionary = { [key: string]: any };
-
-interface BlockchainOptions {
-  network?: 'mainnet' | 'testnet'
-}
-
 class BlockchainClient extends Blockchain {
-  constructor({ network = 'mainnet' } = {} as BlockchainOptions) {
+  constructor({ network }: { network: BlockchainNetworks } = { network: 'mainnet' }) {
     super();
     this.network = network;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
@@ -23,7 +16,7 @@ class BlockchainClient extends Blockchain {
     throw new Error("Connect method not implemented.");
   }
 
-  async sendPayment(address: string, amount: number, destinTag: string, callback: (data: Dictionary) => void) {
+  async sendPayment(address: string, amount: number, destinTag: string, callback: (data: Record<string, any>) => void) {
     console.log('Sending payment...', address, amount, destinTag)
     // TODO: Implementation for sending payment and handling the response
     throw new Error("SendPayment method not implemented.");

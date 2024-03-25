@@ -87,16 +87,6 @@ class Stellar extends ChainInstance {
     throw new Error("FIND_OFFER_ method not yet implemented.");
   }
 
-  fromBaseUnit(amount: number): number {
-    const wei = 10 ** this.provider.decimals
-    return amount / wei
-  }
-
-  toBaseUnit(amount: number): number {
-    const wei = 10 ** this.provider.decimals
-    return amount * wei
-  }
-
   async fetchLedger(method: string, query: string) {
     try {
       let url = this.provider.rpcurl + query

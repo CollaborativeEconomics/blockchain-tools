@@ -45,16 +45,6 @@ export default class Avalanche extends ChainInstance {
     return info
   }
 
-  public toBaseUnit(amount: number) {
-    const sats = 10 ** this.provider.decimals
-    return amount / sats
-  }
-
-  public fromBaseUnit(amount: number): number {
-    const sats = 10 ** this.provider.decimals
-    return amount * sats
-  }
-
   async fetchLedger(method: string, params: any) {
     let data = { id: '1', jsonrpc: '2.0', method, params }
     let body = JSON.stringify(data)
