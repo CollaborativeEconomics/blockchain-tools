@@ -29,7 +29,7 @@ class Blockchain extends ChainInstance {
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 
-  constructor({ network }) {
+  constructor({ network } = { network: 'mainnet' }) {
     super();
     this.network = network;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
@@ -53,10 +53,6 @@ class Blockchain extends ChainInstance {
 
   async fetchLedger(method: string, params: unknown) {
     {FETCH_LEDGER_FUNCTION}
-  }
-
-  findToken(tokenId: string): unknown {
-    {FIND_TOKEN_FUNCTION}
   }
 
   // TODO: Additional common methods specific to this blockchain

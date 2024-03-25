@@ -56,10 +56,6 @@ class XinFin extends ChainInstance {
 
   }
 
-  findOffer(txInfo: any): unknown {
-    throw new Error("FIND_OFFER_ method not yet implemented.");
-  }
-
   fromBaseUnit(amount: number): number {
     const wei = 10 ** this.provider.decimals
     return amount / wei
@@ -82,10 +78,6 @@ class XinFin extends ChainInstance {
       console.error(ex)
       return { error: ex.message }
     }
-  }
-
-  findToken(tokenId: string): unknown {
-    throw new Error("FIND_TOKEN_ method not yet implemented.");
   }
 
   addressToHex(adr: string) {

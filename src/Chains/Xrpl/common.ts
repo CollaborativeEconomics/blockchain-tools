@@ -1,56 +1,50 @@
-import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
+import { get } from 'lodash';
+import ChainInstance, { Chain, ChainSymbol } from "@/Chains/ChainInstance";
+import { NFTokenCreateOffer, NFTokenMint, Node, TxResponse, isCreatedNode, isModifiedNode } from 'xrpl';
+import { NFTokenPage } from 'xrpl/src/models/ledger';
 
-export const rippleMainnet = {
-  id: 1,
-  name: 'Mainnet',
+export const mainnetConfig = {
+  id: 0,
+  name: 'Xrpl Mainnet',
   symbol: 'XRP',
   decimals: 6,
-  gasprice: '0',
-  explorer: 'https://xrpscan.com/tx/',
+  gasprice: '250000000',
+  explorer: 'https://livenet.xrpl.org',
   rpcurl: 'https://s1.ripple.com:51234',
   wssurl: 'wss://s1.ripple.com'
-}
+};
 
-export const rippleTestnet = {
-  id: 2,
-  name: 'Testnet',
+export const testnetConfig = {
+  id: 0,
+  name: 'Xrpl Testnet',
   symbol: 'XRP',
   decimals: 6,
-  gasprice: '0',
-  explorer: 'https://test.bithomp.com/explorer/',
+  gasprice: '250000000',
+  explorer: 'https://testnet.xrpl.org',
   rpcurl: 'https://s.altnet.rippletest.net:51234',
-  wssurl: 'wss://s.altnet.rippletest.net'
-}
+  wssurl: 'wss://s.altnet.rippletest.net:51233'
+};
 
-class Ripple extends ChainInstance {
-  chain: Chain = 'XRPL'
-  symbol: ChainSymbol = 'XRP'
-  logo = 'https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png?1605778731'
-  network = process.env.NEXT_PUBLIC_XRPL_NETWORK!
-  mainnet = rippleMainnet
-  testnet = rippleTestnet
-  provider = process.env.NEXT_PUBLIC_XRPL_NETWORK === 'mainnet' ? this.mainnet : this.testnet
-  constructor() {
+class Xrpl extends ChainInstance {
+  chain: Chain = 'XRPL';
+  symbol: ChainSymbol = 'XRP';
+  logo = 'xrp.png';
+  mainnet = mainnetConfig;
+  testnet = testnetConfig;
+
+  constructor({ network } = { network: 'mainnet' }) {
     super();
+    this.network = network;
+    this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
   }
-  async getTransactionInfo(txid: string) {
+
+  async getTransactionInfo(txid: string): Promise<unknown> {
     console.log('Get tx info by txid', txid)
-    const txResponse = await this.fetchLedger(
-      'tx', [
-      {
-        transaction: txid,
-        binary: false
-      }
-    ]
-    )
+    const txResponse = await this.fetchLedger('POST', { method: 'tx', params: [{ transaction: txid, binary: false }] })
     if (!txResponse || 'error' in txResponse) {
       console.log('ERROR: Exception occured while retrieving transaction info', txid)
       return { error: 'Exception occured while retrieving transaction info' }
-    }
-    if (
-      txResponse?.result?.validated === undefined &&
-      txResponse?.result?.validated
-    ) {
+    } if (txResponse?.result?.validated === undefined && txResponse?.result?.validated) {
       console.log('ERROR', 'Transaction is not validated on ledger')
       return { error: 'Transaction is not validated on ledger' }
     }
@@ -64,66 +58,74 @@ class Ripple extends ChainInstance {
     }
     return result
   }
-  findOffer(txInfo: any) {
-    for (var i = 0; i < txInfo.result.meta.AffectedNodes.length; i++) {
-      let node = txInfo.result.meta.AffectedNodes[i]
-      if (node.CreatedNode && node.CreatedNode.LedgerEntryType == 'NFTokenOffer') {
-        return node.CreatedNode.LedgerIndex
+
+  findOffer(txInfo: TxResponse<NFTokenCreateOffer>): unknown {
+    const affectedNodes = get(txInfo, 'result.meta.AffectedNodes') as Node[] | undefined;
+    if (typeof affectedNodes === 'undefined') {
+      return { error: 'No affected nodes found' };
+    }
+    for (var i = 0; i < affectedNodes.length; i++) {
+      let node = affectedNodes[i];
+      if (isCreatedNode(node) && node.CreatedNode.LedgerEntryType == 'NFTokenOffer') {
+        return node.CreatedNode.LedgerIndex;
       }
     }
   }
-  fromBaseUnit(amount: number) {
-    const sats = 10 ** this.provider.decimals
-    return amount / sats
+
+  fromBaseUnit(amount: number): number {
+    const wei = 10 ** this.provider.decimals
+    return amount / wei
   }
-  toBaseUnit(amount: number) {
-    const sats = 10 ** this.provider.decimals
-    return amount * sats
+
+  toBaseUnit(amount: number): number {
+    const wei = 10 ** this.provider.decimals
+    return amount * wei
   }
-  async fetchLedger(method: string, params: unknown) { // TODO: what's the actual type of payload?
-    const payload = {
-      method, params
-    }
+
+  async fetchLedger(method: string, params: unknown) {
     try {
       let url = this.provider.rpcurl
-      let options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }
+      let options = { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params) }
       let result = await fetch(url, options)
       let data = await result.json()
       return data
-    } catch (ex) {
+    } catch (ex: any) {
       console.error(ex)
-      if (ex instanceof Error) {
-        return { error: ex.message }
-      }
+      return { error: ex.message }
     }
   }
-  findToken(txInfo: any) {
-    let found = null
-    for (var i = 0; i < txInfo.result.meta.AffectedNodes.length; i++) {
-      let node = txInfo.result.meta.AffectedNodes[i]
-      if (node.ModifiedNode && node.ModifiedNode.LedgerEntryType == 'NFTokenPage') {
-        let m = node.ModifiedNode.FinalFields.NFTokens.length
-        let n = node.ModifiedNode.PreviousFields.NFTokens.length
-        for (var j = 0; j < m; j++) {
-          let tokenId = node.ModifiedNode.FinalFields.NFTokens[j].NFToken.NFTokenID
+
+  findToken(txInfo: TxResponse<NFTokenMint>): unknown {
+    let found: string | null = null
+    const affectedNodes = get(txInfo, 'result.meta.AffectedNodes') as Node[] | undefined;
+    if (!Array.isArray(affectedNodes)) {
+      return { error: 'No affected nodes found' };
+    }
+    for (var i = 0; i < affectedNodes.length; i++) {
+      let node = affectedNodes[i]
+      if (isModifiedNode(node)) {
+        let tokens = get(node, 'ModifiedNode.FinalFields.NFTokens') as NFTokenPage['NFTokens'] | undefined;
+
+        let previousTokens = get(node, 'ModifiedNode.PreviousFields.NFTokens') as NFTokenPage['NFTokens'] | undefined;
+
+        if (typeof tokens === 'undefined' || typeof previousTokens === 'undefined') {
+          return { error: 'No final or previous fields found' };
+        }
+
+        for (var j = 0; j < tokens.length; j++) {
+          let tokenId = tokens[j].NFToken.NFTokenID
           found = tokenId
-          for (var k = 0; k < n; k++) {
-            if (tokenId == node.ModifiedNode.PreviousFields.NFTokens[k].NFToken.NFTokenID) {
+          for (var k = 0; k < previousTokens.length; k++) {
+            if (tokenId == previousTokens[k].NFToken.NFTokenID) {
               found = null
+
               break
             }
-          }
-          if (found) { break }
+          } if (found) { break }
         }
-      }
-      if (found) { break }
-    }
-    return found
+      } if (found) { break }
+    } return found
   }
 };
 
-export default Ripple;
+export default Xrpl;

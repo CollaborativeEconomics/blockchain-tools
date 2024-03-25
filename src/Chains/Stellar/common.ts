@@ -113,9 +113,6 @@ class Stellar extends ChainInstance {
     }
   }
 
-  findToken(tokenId: string): unknown {
-    throw new Error("FIND_TOKEN_ method not yet implemented.");
-  }
 };
 
 export default Stellar;

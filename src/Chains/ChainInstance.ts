@@ -37,7 +37,6 @@ export default abstract class ChainInstance {
   public abstract fromBaseUnit(amount: number): number;
   public abstract toBaseUnit(amount: number): number;
   public abstract fetchLedger(method: unknown, params: unknown): unknown;
-  public abstract findToken(tokenId: string): unknown;
 
   // client functions, only defined on client subclasses
   public connect?(callback: (data: unknown) => void): void { };

@@ -1,19 +1,28 @@
 'use client';
 
+import Xrpl from "./common";
 import { Xumm } from "xumm";
-import Ripple from "./common";
-import type { XummJsonTransaction, XummPostPayloadBodyJson, PayloadAndSubscription } from 'xumm-sdk/dist/src/types'
+import { XummJsonTransaction } from "xumm-sdk/dist/src/types";
 
+type Dictionary = { [key: string]: any };
 
-type Dictionary = { [key: string]: any }
+interface XrplOptions {
+  network?: 'mainnet' | 'testnet',
+  apiKey?: string,
+  apiSecret?: string
+}
 
-const apikey = process.env.NEXT_PUBLIC_XUMM_API_KEY || ''
-const secret = process.env.XUMM_API_SECRET || ''
+class XrplClient extends Xrpl {
+  wallet: Xumm;
+  constructor({ network = 'mainnet', apiKey, apiSecret } = {} as XrplOptions) {
+    super();
+    this.network = network;
+    this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
+    if (!apiKey || !apiSecret) throw new Error('Missing Xumm API key and secret')
+    this.wallet = new Xumm(apiKey, apiSecret)
+  }
 
-class RippleClient extends Ripple {
-  wallet = new Xumm(apikey, secret)
-
-  async connect(callback: (data: Dictionary) => void) {
+  async connect(callback: (options: Record<string, any>) => void) {
     console.log('XRP Connecting...')
     this.wallet.authorize().then((state) => {
       console.log('Xumm Authorized', state)
@@ -43,7 +52,7 @@ class RippleClient extends Ripple {
         console.log('Error', state)
         return
       }
-    }).catch((ex) => {
+    }).catch((ex: any) => {
       console.log('Error', ex)
     })
   }
@@ -57,10 +66,59 @@ class RippleClient extends Ripple {
     }
     if (destinTag) { request.DestinationTag = destinTag }
     //this.sendPayload(request, callback)
-    if (!this.wallet.payload) {
-      throw new Error('Xumm wallet not initialized');
+    if (!this.wallet) { callback({ success: false, txid: '' }); return }
+    this?.wallet?.payload?.createAndSubscribe(request, (event) => {
+      if (Object.keys(event.data).indexOf('opened') > -1) {
+        // Update the UI? The payload was opened.
+        console.log('OPENED')
+      }
+      if (Object.keys(event.data).indexOf('signed') > -1) {
+        // The `signed` property is present, true (signed) / false (rejected)
+        console.log('SIGNED', event.data.signed)
+        return event
+      }
+    }).then((payload: any) => {
+      console.log('CREATED', payload)
+      // @ts-ignore: I hate types
+      console.log('Payload URL:', payload?.created.next.always)
+      // @ts-ignore: I hate types
+      console.log('Payload QR:', payload?.created.refs.qr_png)
+      // @ts-ignore: I hate types
+      return payload.resolved // Return payload promise for the next `then`
+    }).then((payload: any) => {
+      console.log('RESOLVED')
+      console.log('Payload resolved', payload)
+      if (Object.keys(payload.data).indexOf('signed') > -1) {
+        const approved = payload.data.signed
+        console.log(approved ? 'APPROVED' : 'REJECTED')
+        if (approved) {
+          callback({ success: true, txid: payload.data.txid })
+        } else {
+          callback({ success: false, txid: '' })
+        }
+      }
+    }).catch((ex: any) => {
+      console.log('ERROR', ex)
+      callback({ success: false, txid: '', error: 'Error sending payment: ' + ex })
+    })
+    // This is where you can do `xumm.payload.get(...)` to fetch details
+    console.log('----DONE')
+  }
+
+  async acceptSellOffer(offerId: string, address: string, callback: any) {
+    console.log('XRP Accept sell offer...', offerId, address)
+    const request: XummJsonTransaction = {
+      TransactionType: 'NFTokenAcceptOffer',
+      NFTokenSellOffer: offerId,
+      Account: address
     }
-    this.wallet.payload.createAndSubscribe(request, (event) => {
+    this.sendPayload(request, callback)
+  }
+
+  async sendPayload(request: XummJsonTransaction, callback: any) {
+    console.log('REQUEST', request)
+    if (!this.wallet) { callback({ success: false, txid: '' }); return }
+    this?.wallet?.payload?.createAndSubscribe(request, (event) => {
       if (Object.keys(event.data).indexOf('opened') > -1) {
         // Update the UI? The payload was opened.
         console.log('OPENED')
@@ -90,15 +148,13 @@ class RippleClient extends Ripple {
           callback({ success: false, txid: '' })
         }
       }
-    }).catch((ex) => {
+    }).catch((ex: any) => {
       console.log('ERROR', ex)
       callback({ success: false, txid: '', error: 'Error sending payment: ' + ex })
     })
     // This is where you can do `xumm.payload.get(...)` to fetch details
     console.log('----DONE')
   }
-
 }
 
-const RippleClientInstance = new RippleClient();
-export default RippleClientInstance;
+export default XrplClient;

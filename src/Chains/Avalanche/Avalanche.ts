@@ -75,10 +75,6 @@ export default class Avalanche extends ChainInstance {
     throw new Error('Method not implemented.');
   }
 
-  public findToken(tokenId: string): unknown {
-    throw new Error('Method not implemented.');
-  }
-
   public toHex(str: string): string {
     return '0x' + parseInt(str).toString(16)
   }

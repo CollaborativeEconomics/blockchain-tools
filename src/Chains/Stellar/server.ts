@@ -87,5 +87,4 @@ class StellarServer extends Stellar {
 */
 }
 
-const StellarServerInstance = new StellarServer();
-export default StellarServerInstance;
+export default StellarServer;

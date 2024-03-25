@@ -1,24 +1,21 @@
-import Ripple from "./common";
-import { Client, NFTokenCreateOffer, NFTokenCreateOfferFlags, NFTokenMintFlags, Wallet, convertStringToHex, isoTimeToRippleTime } from "xrpl";
+import { Wallet, Client, convertStringToHex, NFTokenMintFlags, isoTimeToRippleTime, NFTokenCreateOfferFlags, NFTokenCreateOffer, Transaction, TransactionMetadata } from 'xrpl'
+import Xrpl from "./common";
 
-class RippleServer extends Ripple {
+class XrplServer extends Xrpl {
 
-  // Mints NFT and returns tokenId
-  //   uri: uri to metadata
-  //   taxon: same id for all similar nfts
   async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
     console.log('XRP Minting NFT...', uri, donor)
     let client = null
     let sourceTag = parseInt(process.env.XRPL_SOURCE_TAG || '77777777')
     if (!taxon) { taxon = 123456000 }
     try {
-      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED!)
+      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED || '')
       let account = wallet.classicAddress
       console.log('ADDRESS', account)
-      let flags = NFTokenMintFlags.tfBurnable + NFTokenMintFlags.tfOnlyXRP
       let nftUri = convertStringToHex(uri)
+      let flags = NFTokenMintFlags.tfBurnable + NFTokenMintFlags.tfOnlyXRP
       if (transfer) { flags += NFTokenMintFlags.tfTransferable }
-      let tx = {
+      let tx: Transaction = {
         TransactionType: 'NFTokenMint',
         Account: account,
         URI: nftUri,          // uri to metadata
@@ -28,38 +25,34 @@ class RippleServer extends Ripple {
       }
       //if(destinTag){ tx.DestinationTag = destinTag }
       console.log('TX', tx)
-      client = new Client(this.provider.wssurl) as any // TODO: get xrpl types, why don't they have?
+      client = new Client(this.provider.wssurl || '')
       await client.connect()
       let txInfo = await client.submitAndWait(tx, { wallet })
-      console.log('Result:', txInfo?.result?.meta?.TransactionResult)
-      if (txInfo?.result?.meta?.TransactionResult == 'tesSUCCESS') {
+      const txRes = (txInfo?.result?.meta as TransactionMetadata).TransactionResult
+      console.log('Result:', txRes)
+      if (txRes == 'tesSUCCESS') {
         //console.log('TXINFO', JSON.stringify(txInfo))
         let tokenId = this.findToken(txInfo)
         console.log('TokenId:', tokenId)
         return { success: true, tokenId }
       }
-    } catch (ex) {
-      const message = ex instanceof Error ? ex.message : JSON.stringify(ex)
+    } catch (ex: any) {
       console.error(ex)
-      return { success: false, error: 'Error minting NFT: ' + message }
+      return { success: false, error: 'Error minting NFT: ' + ex?.message || 'unknown' }
     } finally {
       client?.disconnect()
     }
   }
 
-  // Creates a sell offer
-  //   tokenId: nft that will be offered
-  //   destinAcct: address that will approve the offer
-  //   expires: optional date if offer will expire
   async createSellOffer(tokenId: string, destinationAddress: string, offerExpirationDate?: string) {
     console.log('XRP Sell offer', tokenId, destinationAddress)
     let client = null
     try {
       console.log('SEED', process.env.XRPL_MINTER_WALLET_SEED)
-      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED!)
+      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED || '')
       let account = wallet.classicAddress
       console.log('ACT', account)
-      let tx = {
+      let tx: Transaction = {
         TransactionType: 'NFTokenCreateOffer',
         Account: account,
         NFTokenID: tokenId,
@@ -72,11 +65,12 @@ class RippleServer extends Ripple {
       }
       console.log('TX', tx)
       console.log('WSS', this.provider.wssurl)
-      client = new Client(this.provider.wssurl)
+      client = new Client(this.provider.wssurl || '')
       await client.connect()
       let txInfo = await client.submitAndWait(tx, { wallet })
-      console.log('Result:', txInfo?.result?.meta?.TransactionResult)
-      if (txInfo?.result?.meta?.TransactionResult == 'tesSUCCESS') {
+      const txRes = (txInfo?.result?.meta as TransactionMetadata).TransactionResult
+      console.log('Result:', txRes)
+      if (txRes == 'tesSUCCESS') {
         let offerId = this.findOffer(txInfo)
         console.log('OfferId', offerId)
         return { success: true, offerId }
@@ -91,7 +85,78 @@ class RippleServer extends Ripple {
     }
   }
 
+  /*
+  async acceptSellOffer(offerId, address, callback) {
+    console.log('Client XRP Accept sell offer...', offerId, address)
+    const request:XummJsonTransaction = {
+      TransactionType: 'NFTokenAcceptOffer',
+      NFTokenSellOffer: offerId,
+      Account: address
+    }
+    this.sendPayload(request, callback)
+  }
+
+  async sendPayload(request, callback){
+    console.log('REQUEST', request)
+    this.wallet.payload.createAndSubscribe(request, (event) => {
+      if (Object.keys(event.data).indexOf('opened') > -1) {
+        // Update the UI? The payload was opened.
+        console.log('OPENED')
+      }
+      if (Object.keys(event.data).indexOf('signed') > -1) {
+        // The `signed` property is present, true (signed) / false (rejected)
+        console.log('SIGNED', event.data.signed)
+        return event
+      }
+    }).then(payload => {
+      console.log('CREATED', payload)
+      // @ts-ignore: I hate types
+      console.log('Payload URL:', payload?.created.next.always)
+      // @ts-ignore: I hate types
+      console.log('Payload QR:', payload?.created.refs.qr_png)
+      // @ts-ignore: I hate types
+      return payload.resolved // Return payload promise for the next `then`
+    }).then((payload) => {
+      console.log('RESOLVED')
+      console.log('Payload resolved', payload)
+      if (Object.keys(payload.data).indexOf('signed') > -1) {
+        const approved = payload.data.signed
+        console.log(approved ? 'APPROVED' : 'REJECTED')
+        if(approved){
+          callback({success:true, txid:payload.data.txid})
+        } else {
+          callback({success:false, txid:''})
+        }
+      }
+    }).catch((ex) => {
+      console.log('ERROR', ex)
+      callback({success:false, txid:'', error:'Error sending payment: '+ex})
+    })
+    // This is where you can do `xumm.payload.get(...)` to fetch details
+    console.log('----DONE')
+  }
+*/
+  /*
+    async getAccountNFTs(account: string) {
+      console.log({ account })
+      let txInfo = await this.fetchApi({
+        method: 'account_nfts',
+        params: [
+          {
+            account: account,
+            ledger_index: 'validated'
+          }
+        ]
+      })
+      if (!txInfo || 'error' in txInfo) {
+        console.log('ERROR', 'Account not found:', { account })
+        return { error: 'Account not found' }
+      }
+      console.log('NFTs', txInfo)
+      return txInfo?.result?.account_nfts
+    }
+  */
 }
 
-const RippleServerInstance = new RippleServer()
-export default RippleServerInstance
+const XrplServerInstance = new XrplServer();
+export default XrplServerInstance;
