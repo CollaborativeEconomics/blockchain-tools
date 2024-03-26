@@ -36,7 +36,7 @@ export const futurenetConfig = {
   wssurl: ''
 }
 
-type StellarNetworks = 'mainnet' | 'testnet' | 'futurenet'
+export type StellarNetworks = 'mainnet' | 'testnet' | 'futurenet'
 const networkMap: Record<StellarNetworks, NetworkProvider> = {
   mainnet: mainnetConfig,
   testnet: testnetConfig,
@@ -92,9 +92,6 @@ class Stellar extends ChainInstance {
       let url = this.provider.rpcurl + query
       console.log('FETCH', url)
       let options = {
-
-        method,
-
         headers: { 'Content-Type': 'application/json' }
       }
       let result = await fetch(url, options)

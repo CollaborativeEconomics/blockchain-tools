@@ -1,4 +1,4 @@
-import * as SorobanClient from 'soroban-client'
+import { ContractSpec } from '@stellar/stellar-sdk'
 import invoke from './invoker'
 
 export const Networks = {
@@ -17,9 +17,9 @@ export const Networks = {
 export class Contract {
   options;
   spec;
-  constructor(options:any) {
+  constructor(options: any) {
     this.options = options;
-    this.spec = new SorobanClient.ContractSpec([
+    this.spec = new ContractSpec([
       "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAARuYW1lAAAAEAAAAAAAAAAGc3ltYm9sAAAAAAAQAAAAAA==",
       "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAA=",
       "AAAAAAAAAAAAAAAHYXBwcm92ZQAAAAACAAAAAAAAAAVvd25lcgAAAAAAABMAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAA=",
@@ -40,7 +40,7 @@ export class Contract {
       "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAACQAAAAAAAAAAAAAABUFkbWluAAAAAAAAAQAAAAAAAAAHQmFsYW5jZQAAAAABAAAAEwAAAAAAAAAAAAAABE5hbWUAAAABAAAAAAAAAAVOb25jZQAAAAAAAAEAAAATAAAAAQAAAAAAAAAFT3duZXIAAAAAAAABAAAACwAAAAEAAAAAAAAACE9wZXJhdG9yAAAAAQAAABMAAAABAAAAAAAAAAVTdGF0ZQAAAAAAAAEAAAATAAAAAAAAAAAAAAAGU3VwcGx5AAAAAAAAAAAAAAAAAAZTeW1ib2wAAA=="
     ]);
   }
-  async initialize({ admin, name, symbol }:any, options = {}) {
+  async initialize({ admin, name, symbol }: any, options = {}) {
     const res = await invoke({
       method: 'initialize',
       args: this.spec.funcArgsToScVals("initialize", { admin, name, symbol }),
@@ -50,7 +50,7 @@ export class Contract {
     });
     return res
   }
-  async setAdmin({ new_admin }:any, options = {}) {
+  async setAdmin({ new_admin }: any, options = {}) {
     const res = await invoke({
       method: 'set_admin',
       args: this.spec.funcArgsToScVals("set_admin", { new_admin }),
@@ -60,7 +60,7 @@ export class Contract {
     });
     return res
   }
-  async approve({ owner, operator }:any, options = {}) {
+  async approve({ owner, operator }: any, options = {}) {
     const res = await invoke({
       method: 'approve',
       args: this.spec.funcArgsToScVals("approve", { owner, operator }),
@@ -70,7 +70,7 @@ export class Contract {
     });
     return res
   }
-  async unapprove({ owner }:any, options = {}) {
+  async unapprove({ owner }: any, options = {}) {
     const res = await invoke({
       method: 'unapprove',
       args: this.spec.funcArgsToScVals("unapprove", { owner }),
@@ -80,7 +80,7 @@ export class Contract {
     });
     return res
   }
-  async mint({ to }:any, options = {}) {
+  async mint({ to }: any, options = {}) {
     const res = await invoke({
       method: 'mint',
       args: this.spec.funcArgsToScVals("mint", { to }),
@@ -90,7 +90,7 @@ export class Contract {
     });
     return res
   }
-  async transfer({ from, to, id }:any, options = {}) {
+  async transfer({ from, to, id }: any, options = {}) {
     const res = await invoke({
       method: 'transfer',
       args: this.spec.funcArgsToScVals("transfer", { from, to, id }),
@@ -100,7 +100,7 @@ export class Contract {
     });
     return res
   }
-  async transferFrom({ operator, from, to, id }:any, options = {}) {
+  async transferFrom({ operator, from, to, id }: any, options = {}) {
     const res = await invoke({
       method: 'transfer_from',
       args: this.spec.funcArgsToScVals("transfer_from", { operator, from, to, id }),
@@ -110,7 +110,7 @@ export class Contract {
     });
     return res
   }
-  async burn({ from, id }:any, options = {}) {
+  async burn({ from, id }: any, options = {}) {
     const res = await invoke({
       method: 'burn',
       args: this.spec.funcArgsToScVals("burn", { from, id }),
@@ -120,7 +120,7 @@ export class Contract {
     });
     return res
   }
-  async burnFrom({ operator, from, id }:any, options = {}) {
+  async burnFrom({ operator, from, id }: any, options = {}) {
     const res = await invoke({
       method: 'burn_from',
       args: this.spec.funcArgsToScVals("burn_from", { operator, from, id }),
@@ -136,19 +136,19 @@ export class Contract {
       args: this.spec.funcArgsToScVals("admin", {}),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("admin", xdr);
       },
     });
     return res
   }
-  async balance({ id }:any, options = {}) {
+  async balance({ id }: any, options = {}) {
     const res = await invoke({
       method: 'balance',
       args: this.spec.funcArgsToScVals("balance", { id }),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("balance", xdr);
       },
     });
@@ -160,31 +160,31 @@ export class Contract {
       args: this.spec.funcArgsToScVals("name", {}),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("name", xdr);
       },
     });
     return res
   }
-  async operator({ owner }:any, options = {}) {
+  async operator({ owner }: any, options = {}) {
     const res = await invoke({
       method: 'operator',
       args: this.spec.funcArgsToScVals("operator", { owner }),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("operator", xdr);
       },
     });
     return res
   }
-  async owner({ id }:any, options = {}) {
+  async owner({ id }: any, options = {}) {
     const res = await invoke({
       method: 'owner',
       args: this.spec.funcArgsToScVals("owner", { id }),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("owner", xdr);
       },
     });
@@ -196,7 +196,7 @@ export class Contract {
       args: this.spec.funcArgsToScVals("supply", {}),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("supply", xdr);
       },
     });
@@ -208,7 +208,7 @@ export class Contract {
       args: this.spec.funcArgsToScVals("symbol", {}),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("symbol", xdr);
       },
     });
@@ -220,7 +220,7 @@ export class Contract {
       args: this.spec.funcArgsToScVals("token_uri", {}),
       ...options,
       ...this.options,
-      parseResultXdr: (xdr:any) => {
+      parseResultXdr: (xdr: any) => {
         return this.spec.funcResToNative("token_uri", xdr);
       },
     });

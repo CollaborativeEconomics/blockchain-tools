@@ -1,17 +1,28 @@
 import { Contract, Networks } from '../../Contracts/nft721'
-import Stellar from "./common";
+import Stellar, { StellarNetworks } from "./common";
 
 class StellarServer extends Stellar {
+  walletSeed: string;
+  contract: string;
+
+  constructor({ network, contract, walletSeed } = { network: 'mainnet' as StellarNetworks, contract: '', walletSeed: '' }) {
+    super()
+    this.network = network
+    this.walletSeed = walletSeed
+    this.contract = contract
+    this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
+  }
 
   async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
     console.log(this.chain, 'minting NFT to', donor, uri)
     // const network = this.network == 'futurenet' ? this.futurenet : this.testnet
     const contractConfigMap = {
-      futurenet: Networks.futurenet,
-      testnet: Networks.testnet,
-      mainnet: Networks.futurenet, // TODO: Add mainnet config
+      futurenet: { ...Networks.futurenet, walletSeed: this.walletSeed },
+      testnet: { ...Networks.testnet, walletSeed: this.walletSeed },
+      mainnet: { ...Networks.futurenet, walletSeed: this.walletSeed }, // TODO: Add mainnet config
     }
     // console.log('NET', network)
+    // TODO: take out the hardcoded contracts
     const contract = new Contract(contractConfigMap[this.network])
     //console.log('CTR', contract.spec)
     const info = await contract.mint({ to: donor })
@@ -35,8 +46,8 @@ class StellarServer extends Stellar {
     console.log(this.chain, 'minting NFT to', address, uri)
     try {
       const server  = new StellarSdk.Server(this.provider.rpcurl)
-      const minter  = StellarSdk.Keypair.fromSecret(process.env.STELLAR_MINTER_WALLET_SECRET) // GDDMY...
       const issuer  = minter.publicKey()
+      const minter  = StellarSdk.Keypair.fromSecret(this.walletSeed) // GDDMY...
       const source  = await server.loadAccount(issuer)
       const myNFT   = new StellarSdk.Asset('GIVEXLM', issuer)
       //const phrase  = this.network=='mainnet' ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET

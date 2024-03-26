@@ -1,21 +1,19 @@
-const SorobanClient = require('soroban-client')
-//import * as SorobanClient from 'soroban-client'
-//import {assembleTransaction, Contract, Keypair, Server, SorobanRpc, TransactionBuilder, TimeoutInfinite} from 'soroban-client'
+import { SorobanRpc, Keypair, Contract, TransactionBuilder, xdr, TimeoutInfinite } from '@stellar/stellar-sdk';
 
-async function sendTx(tx:any, secondsToWait:number, server:any) {
+async function sendTx(tx: any, secondsToWait: number, server: any) {
   //console.log('SEND', tx)
   //console.log('SERV', server)
   const sendTransactionResponse = await server.sendTransaction(tx);
   const txid = sendTransactionResponse.hash
   if (sendTransactionResponse.status !== "PENDING" || secondsToWait === 0) {
     console.log('DONE')
-    return {raw:sendTransactionResponse, txid};
+    return { raw: sendTransactionResponse, txid };
   }
   let getTransactionResponse = await server.getTransaction(sendTransactionResponse.hash);
   const waitUntil = new Date(Date.now() + secondsToWait * 1000).valueOf();
   let waitTime = 1000;
   let exponentialFactor = 1.5;
-  while (Date.now() < waitUntil && getTransactionResponse.status === SorobanClient.SorobanRpc.GetTransactionStatus.NOT_FOUND) {
+  while (Date.now() < waitUntil && getTransactionResponse.status === SorobanRpc.Api.GetTransactionStatus.NOT_FOUND) {
     // Wait a beat
     console.log('WAIT')
     await new Promise((resolve) => setTimeout(resolve, waitTime));
@@ -25,37 +23,49 @@ async function sendTx(tx:any, secondsToWait:number, server:any) {
     getTransactionResponse = await server.getTransaction(sendTransactionResponse.hash);
     console.log('RESTR', getTransactionResponse?.status)
   }
-  if (getTransactionResponse.status === SorobanClient.SorobanRpc.GetTransactionStatus.NOT_FOUND) {
+  if (getTransactionResponse.status === SorobanRpc.Api.GetTransactionStatus.NOT_FOUND) {
     console.log('NOTFOUND')
     console.error(`Waited ${secondsToWait} seconds for transaction to complete, but it did not. ` +
       `Returning anyway. Check the transaction status manually. ` +
       `Info: ${JSON.stringify(sendTransactionResponse, null, 2)}`);
   }
   console.log('RESOK')
-  return {raw:getTransactionResponse, txid}
+  return { raw: getTransactionResponse, txid }
 }
 
-export default async function invoke({ method, args = [], fee = 100, responseType, parseResultXdr, secondsToWait = 10, rpcUrl, networkPassphrase, contractId, wallet, }:any) {
-//export default async function invoke(props:any) {
+export default async function invoke({
+  method,
+  args = [],
+  fee = 100,
+  responseType,
+  parseResultXdr,
+  secondsToWait = 10,
+  rpcUrl,
+  networkPassphrase,
+  contractId,
+  wallet,
+  walletSeed,
+}: any) {
+  //export default async function invoke(props:any) {
   //console.log('DATA', JSON.stringify({ method, args, fee, responseType, parseResultXdr, secondsToWait, rpcUrl, networkPassphrase, contractId, wallet }, null, 2))
   console.log('ContractId', contractId)
   let parse = parseResultXdr
-  const server = new SorobanClient.Server(rpcUrl, {allowHttp: rpcUrl.startsWith("http://")})
-  const signer = SorobanClient.Keypair.fromSecret(process.env.STELLAR_MINTER_WALLET_SECRET)
+  const server = new SorobanRpc.Server(rpcUrl, { allowHttp: rpcUrl.startsWith("http://") })
+  const signer = Keypair.fromSecret(walletSeed)
   //const signer = SorobanClient.Keypair.fromSecret('S...') // GDDMY... REMOVE WHEN READY
   const pubkey = signer.publicKey()
   console.log('Signer', pubkey)
   const account = await server.getAccount(pubkey)
   console.log('Account', account)
-  const contract = new SorobanClient.Contract(contractId)
-  let tx = new SorobanClient.TransactionBuilder(account, {fee: fee.toString(10), networkPassphrase})
+  const contract = new Contract(contractId)
+  let tx = new TransactionBuilder(account, { fee: fee.toString(10), networkPassphrase })
     .addOperation(contract.call(method, ...args))
-    .setTimeout(SorobanClient.TimeoutInfinite)
+    .setTimeout(TimeoutInfinite)
     .build()
   //console.log('TX', tx)
   const simulated = await server.simulateTransaction(tx)
   //console.log('SIM', simulated)
-  if (SorobanClient.SorobanRpc.isSimulationError(simulated)) {
+  if (SorobanRpc.Api.isSimulationError(simulated)) {
     throw new Error(simulated.error)
   } else if (responseType === "simulated") {
     return simulated
@@ -74,14 +84,14 @@ export default async function invoke({ method, args = [], fee = 100, responseTyp
   if (authsCount > 1) {
     throw new Error('Multiple auths not yet supported')
   }
-  const txr = SorobanClient.assembleTransaction(tx, networkPassphrase, simulated).build()
+  const txr = SorobanRpc.assembleTransaction(tx, simulated).build()
   console.log('TXR', txr)
   txr.sign(signer)
   //const sendTransactionResponse = await server.sendTransaction(txr)
   //console.log('RES', sendTransactionResponse)
   //return sendTransactionResponse
   //--------
-  const {raw, txid} = await sendTx(txr, secondsToWait, server)
+  const { raw, txid } = await sendTx(txr, secondsToWait, server)
   console.log('RAW', raw)
   console.log('TXID', txid)
   //if (responseType === "full") {
@@ -93,9 +103,9 @@ export default async function invoke({ method, args = [], fee = 100, responseTyp
   if ("resultXdr" in raw) {
     console.log('RESXDR')
     const getResult = raw;
-    if (getResult.status !== SorobanClient.SorobanRpc.GetTransactionStatus.SUCCESS) {
+    if (getResult.status !== SorobanRpc.Api.GetTransactionStatus.SUCCESS) {
       console.error('Transaction submission failed! Returning full RPC response.');
-      return {result:raw, txid, success:false}
+      return { result: raw, txid, success: false }
     }
     //console.log('ENV', raw.envelopeXdr.toXDR("base64"))
     //console.log('RES', raw.resultXdr.toXDR("base64"))
@@ -103,9 +113,10 @@ export default async function invoke({ method, args = [], fee = 100, responseTyp
     //const env  = new SorobanClient.xdr.TransactionEnvelope(raw.envelopeXdr)
     //console.log('RES')
     //const res  = new SorobanClient.xdr.TransactionResult(raw.resultXdr)
-    const meta = new SorobanClient.xdr.TransactionMetaV3(raw.resultMetaXdr)
-    const metaval = meta?._attributes?._value?._attributes?.sorobanMeta?._attributes?.events[0]?._attributes?.body?._value?._attributes?.data?._value?._attributes?.lo?._value.toString()
-    const tokenId = contractId+' #'+metaval
+    const meta = new xdr.TransactionMetaV3(raw.resultMetaXdr)
+    // const metaval = meta?._attributes?._value?._attributes?.sorobanMeta?._attributes?.events[0]?._attributes?.body?._value?._attributes?.data?._value?._attributes?.lo?._value.toString()
+    const metaval = meta.sorobanMeta()?.events()[0]?.body()?.value()?.data()?.value();
+    const tokenId = contractId + ' #' + metaval
     console.log('TOKENID', tokenId)
     //console.log('SORM', meta['sorobanMeta'])
     //for(let key in meta['sorobanMeta']){
@@ -126,22 +137,22 @@ export default async function invoke({ method, args = [], fee = 100, responseTyp
     //const tokenId = '123???x'
     //const parsed = parse(raw.resultXdr.result().toXDR("base64"));
     //console.log('PARSED', env, res, meta)
-    return {result:raw, txid, tokenId, success:true}
+    return { result: raw, txid, tokenId, success: true }
   }
   // otherwise, it returned the result of `sendTransaction`
   if ("errorResult" in raw) {
     console.log('ERRRES')
     const parsed = parse(raw.errorResult.result().toXDR("base64"));
-    return {result:parsed, txid, error:'Error sending transaction', success:false}
+    return { result: parsed, txid, error: 'Error sending transaction', success: false }
   }
   if ("errorResultXdr" in raw) {
     console.log('ERRXDR')
-    return {result:raw, txid, error:'Error sending transaction', success:false}
+    return { result: raw, txid, error: 'Error sending transaction', success: false }
     //return parse(raw.errorResultXdr);
   }
   // if neither of these are present, something went wrong
   console.error("Don't know how to parse result! Returning full RPC response.");
-  return {result:raw, txid, error:'Error unknown response', success:false}
+  return { result: raw, txid, error: 'Error unknown response', success: false }
 }
 
 

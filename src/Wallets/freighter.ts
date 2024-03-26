@@ -1,4 +1,4 @@
-import * as StellarSDK from 'stellar-sdk'
+import * as StellarSDK from '@stellar/stellar-sdk'
 import {isConnected, getPublicKey, signTransaction} from "@stellar/freighter-api"
 
 export default class Wallet {
@@ -30,8 +30,8 @@ export default class Wallet {
   async connect() {
     try {
       console.log('CONNECT...')
-      this.soroban = new StellarSDK.Server(this.sorobanurl || '')
-      this.horizon = new StellarSDK.Server(this.horizonurl || '')
+      this.soroban = new StellarSDK.Horizon.Server(this.sorobanurl || '')
+      this.horizon = new StellarSDK.Horizon.Server(this.horizonurl || '')
       this.myaccount = await getPublicKey()
       return {success:true, account:this.myaccount, network:this.network}
     } catch(ex) {

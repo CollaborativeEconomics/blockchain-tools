@@ -2,14 +2,23 @@ import { Wallet, Client, convertStringToHex, NFTokenMintFlags, isoTimeToRippleTi
 import Xrpl from "./common";
 
 class XrplServer extends Xrpl {
+  walletSeed: string;
+  sourceTag?: number;
+
+  constructor({ network, sourceTag, walletSeed } = { network: 'mainnet', sourceTag: 0, walletSeed: '' }) {
+    super()
+    this.network = network
+    this.walletSeed = walletSeed
+    this.sourceTag = sourceTag
+    this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
+  }
 
   async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
     console.log('XRP Minting NFT...', uri, donor)
     let client = null
-    let sourceTag = parseInt(process.env.XRPL_SOURCE_TAG || '77777777')
     if (!taxon) { taxon = 123456000 }
     try {
-      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED || '')
+      let wallet = Wallet.fromSeed(this.walletSeed)
       let account = wallet.classicAddress
       console.log('ADDRESS', account)
       let nftUri = convertStringToHex(uri)
@@ -21,7 +30,7 @@ class XrplServer extends Xrpl {
         URI: nftUri,          // uri to metadata
         NFTokenTaxon: taxon,  // id for all nfts minted by us
         Flags: flags,         // burnable, onlyXRP, non transferable
-        SourceTag: sourceTag, // 77777777
+        SourceTag: this.sourceTag, // 77777777
       }
       //if(destinTag){ tx.DestinationTag = destinTag }
       console.log('TX', tx)
@@ -48,8 +57,7 @@ class XrplServer extends Xrpl {
     console.log('XRP Sell offer', tokenId, destinationAddress)
     let client = null
     try {
-      console.log('SEED', process.env.XRPL_MINTER_WALLET_SEED)
-      let wallet = Wallet.fromSeed(process.env.XRPL_MINTER_WALLET_SEED || '')
+      let wallet = Wallet.fromSeed(this.walletSeed)
       let account = wallet.classicAddress
       console.log('ACT', account)
       let tx: Transaction = {
