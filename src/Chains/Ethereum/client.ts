@@ -4,7 +4,7 @@ import Wallet from "@/Wallets/metamask";
 import Ethereum from "./common";
 
 class EthereumClient extends Ethereum {
-  constructor({ network }: { network: EthereumNetworks } = { network: 'mainnet' }) {
+  constructor({ network } = { network: 'mainnet' }) {
     super();
     this.network = network;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
@@ -40,7 +40,7 @@ class EthereumClient extends Ethereum {
     })
   }
 
-  async sendToken(address: string, amount: string, token: string, contract: string, destinTag: string, callback: any) {
+  async sendToken(address: string, amount: number, token: string, contract: string, destinTag: string, callback: any) {
     console.log(this.chain, 'Sending token...')
     this.connect(async (data) => {
       console.log('Pay connect', data)

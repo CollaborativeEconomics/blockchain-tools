@@ -82,7 +82,7 @@ class EOSServer extends EOS {
       data: memo    // memo initiative id
     }
     console.log('TX', tx)
-    const signed = await this.web3.eth.accounts.signTransaction(tx, secret)
+    const signed = await this.web3.eth.accounts.signTransaction(tx, this.walletSeed)
     const result = await this.web3.eth.sendSignedTransaction(signed.rawTransaction)
     console.log('RESULT', result)
     //const txHash = await this.fetchLedger({method: 'eth_sendTransaction', params: [tx]})

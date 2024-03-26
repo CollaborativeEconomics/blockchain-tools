@@ -40,7 +40,7 @@ class ArbitrumClient extends Arbitrum {
     })
   }
 
-  async sendToken(address: string, amount: string, token: string, contract: string, destinTag: string, callback: any) {
+  async sendToken(address: string, amount: number, token: string, contract: string, destinTag: string, callback: any) {
     console.log(this.chain, 'Sending token...')
     this.connect(async (data) => {
       console.log('Pay connect', data)

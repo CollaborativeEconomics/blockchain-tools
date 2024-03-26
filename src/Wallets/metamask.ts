@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 import erc20abi from '../Contracts/erc20-abi.json'
+import { NetworkProvider } from '@/types/networkProvider'
 
 export default class Wallet {
   neturl = ''
@@ -106,7 +107,7 @@ export default class Wallet {
     console.log('Network', this.network, this.chainId)
   }
 
-  async changeNetwork(provider: WalletProvider) {
+  async changeNetwork(provider: NetworkProvider) {
     console.log('Metamask changing network to', provider.name, provider.id)
     const chainHex = this.toHex(provider.id)
     try {

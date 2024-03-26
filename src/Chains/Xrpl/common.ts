@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import ChainInstance, { Chain, ChainSymbol } from "@/Chains/ChainInstance";
 import { NFTokenCreateOffer, NFTokenMint, Node, TxResponse, isCreatedNode, isModifiedNode } from 'xrpl';
-import { NFTokenPage } from 'xrpl/src/models/ledger';
+import { NFTokenPage } from 'xrpl/dist/npm/models/ledger';
 
 export const mainnetConfig = {
   id: 0,

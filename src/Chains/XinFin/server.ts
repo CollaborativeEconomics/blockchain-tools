@@ -8,9 +8,9 @@ class XinFinServer extends XinFin {
   web3: Web3;
   walletSeed: string;
 
-  constructor({ network, walletSeed }) {
+  constructor({ network, walletSeed } = { network: 'mainnet', walletSeed: '' }) {
     super();
-    this.network = network ?? 'mainnet';
+    this.network = network;
     this.walletSeed = walletSeed;
     this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
     this.web3 = new Web3(this.provider.rpcurl)
@@ -127,7 +127,7 @@ class XinFinServer extends XinFin {
     throw new Error("createSellOffer method not implemented.");
   }
 
-  async sendPayment(address: string, amount: number, destinTag: string, callback: (status: unknown) => void): void {
+  async sendPayment(address: string, amount: number, destinTag: string, callback: (status: unknown) => void): Promise<void> {
     console.log('BNB Sending payment...')
     const value = this.toBaseUnit(amount)
     const acct = this.web3.eth.accounts.privateKeyToAccount(this.walletSeed)

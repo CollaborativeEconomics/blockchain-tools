@@ -57,7 +57,19 @@ class Filecoin extends ChainInstance {
   async getTransactionInfo(txid: string): Promise<unknown> {
     console.log('Get tx info', txid)
     const info = await this.fetchLedger('eth_getTransactionByHash', [txid])
-    if (!info || info?.error) { return { success: false, error: 'Error fetching tx info' } } const result = { success: true, account: info?.from, destination: info?.to, destinationTag: this.hexToStr(info?.input), amount: this.fromWei(info?.value) }
+    if (!info || info?.error) {
+      return {
+        success: false,
+        error: 'Error fetching tx info'
+      }
+    }
+    const result = {
+      success: true,
+      account: info?.from,
+      destination: info?.to,
+      destinationTag: this.hexToStr(info?.input),
+      amount: this.fromBaseUnit(info?.value)
+    }
     return result
   }
 
