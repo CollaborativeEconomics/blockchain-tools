@@ -1,230 +1,270 @@
-import { ContractSpec } from '@stellar/stellar-sdk'
-import invoke from './invoker'
+import {
+  BASE_FEE,
+  Contract,
+  Keypair,
+  Networks,
+  Operation,
+  SorobanDataBuilder,
+  SorobanRpc,
+  Transaction,
+  TransactionBuilder,
+  xdr,
+} from "@stellar/stellar-sdk";
+const { Api, assembleTransaction } = SorobanRpc;
 
-export const Networks = {
+const networks = {
   futurenet: {
-    contractId: 'CDHGVKFRG7CFXVKTZGNM7VKEQWZDBLH733FD6AD3SN7JZIRZSHZM5Q2S',
-    networkPassphrase: 'Test SDF Future Network ; October 2022',
-    rpcUrl: 'https://rpc-futurenet.stellar.org:443'
+    contractId: "CDWEQ6B7ARL7GF72SCTI7HASXCAP7SXWIPWP326VQAUZOXBX5M7SYWZV",
+    networkPassphrase: "Test SDF Future Network ; October 2022",
+    rpcUrl: "https://rpc-futurenet.stellar.org:443",
   },
-  testnet: {
-    contractId: 'CDHGVKFRG7CFXVKTZGNM7VKEQWZDBLH733FD6AD3SN7JZIRZSHZM5Q2S',
-    networkPassphrase: 'Test SDF Network ; September 2015',
-    rpcUrl: 'https://soroban-testnet.stellar.org'
-  }
 };
 
-export class Contract {
-  options;
-  spec;
-  constructor(options: any) {
-    this.options = options;
-    this.spec = new ContractSpec([
-      "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAARuYW1lAAAAEAAAAAAAAAAGc3ltYm9sAAAAAAAQAAAAAA==",
-      "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAA=",
-      "AAAAAAAAAAAAAAAHYXBwcm92ZQAAAAACAAAAAAAAAAVvd25lcgAAAAAAABMAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAA=",
-      "AAAAAAAAAAAAAAAJdW5hcHByb3ZlAAAAAAAAAQAAAAAAAAAFb3duZXIAAAAAAAATAAAAAA==",
-      "AAAAAAAAAAAAAAAEbWludAAAAAEAAAAAAAAAAnRvAAAAAAATAAAAAA==",
-      "AAAAAAAAAAAAAAAIdHJhbnNmZXIAAAADAAAAAAAAAARmcm9tAAAAEwAAAAAAAAACdG8AAAAAABMAAAAAAAAAAmlkAAAAAAALAAAAAA==",
-      "AAAAAAAAAAAAAAANdHJhbnNmZXJfZnJvbQAAAAAAAAQAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAAAAAAEZnJvbQAAABMAAAAAAAAAAnRvAAAAAAATAAAAAAAAAAJpZAAAAAAACwAAAAA=",
-      "AAAAAAAAAAAAAAAEYnVybgAAAAIAAAAAAAAABGZyb20AAAATAAAAAAAAAAJpZAAAAAAACwAAAAA=",
-      "AAAAAAAAAAAAAAAJYnVybl9mcm9tAAAAAAAAAwAAAAAAAAAIb3BlcmF0b3IAAAATAAAAAAAAAARmcm9tAAAAEwAAAAAAAAACaWQAAAAAAAsAAAAA",
-      "AAAAAAAAAAAAAAAFYWRtaW4AAAAAAAAAAAAAAQAAABM=",
-      "AAAAAAAAAAAAAAAHYmFsYW5jZQAAAAABAAAAAAAAAAJpZAAAAAAAEwAAAAEAAAAL",
-      "AAAAAAAAAAAAAAAEbmFtZQAAAAAAAAABAAAAEA==",
-      "AAAAAAAAAAAAAAAIb3BlcmF0b3IAAAABAAAAAAAAAAVvd25lcgAAAAAAABMAAAABAAAAEw==",
-      "AAAAAAAAAAAAAAAFb3duZXIAAAAAAAABAAAAAAAAAAJpZAAAAAAACwAAAAEAAAAT",
-      "AAAAAAAAAAAAAAAGc3VwcGx5AAAAAAAAAAAAAQAAAAs=",
-      "AAAAAAAAAAAAAAAGc3ltYm9sAAAAAAAAAAAAAQAAABA=",
-      "AAAAAAAAAAAAAAAJdG9rZW5fdXJpAAAAAAAAAAAAAAEAAAAQ",
-      "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAACQAAAAAAAAAAAAAABUFkbWluAAAAAAAAAQAAAAAAAAAHQmFsYW5jZQAAAAABAAAAEwAAAAAAAAAAAAAABE5hbWUAAAABAAAAAAAAAAVOb25jZQAAAAAAAAEAAAATAAAAAQAAAAAAAAAFT3duZXIAAAAAAAABAAAACwAAAAEAAAAAAAAACE9wZXJhdG9yAAAAAQAAABMAAAABAAAAAAAAAAVTdGF0ZQAAAAAAAAEAAAATAAAAAAAAAAAAAAAGU3VwcGx5AAAAAAAAAAAAAAAAAAZTeW1ib2wAAA=="
-    ]);
-  }
-  async initialize({ admin, name, symbol }: any, options = {}) {
-    const res = await invoke({
-      method: 'initialize',
-      args: this.spec.funcArgsToScVals("initialize", { admin, name, symbol }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async setAdmin({ new_admin }: any, options = {}) {
-    const res = await invoke({
-      method: 'set_admin',
-      args: this.spec.funcArgsToScVals("set_admin", { new_admin }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async approve({ owner, operator }: any, options = {}) {
-    const res = await invoke({
-      method: 'approve',
-      args: this.spec.funcArgsToScVals("approve", { owner, operator }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async unapprove({ owner }: any, options = {}) {
-    const res = await invoke({
-      method: 'unapprove',
-      args: this.spec.funcArgsToScVals("unapprove", { owner }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async mint({ to }: any, options = {}) {
-    const res = await invoke({
-      method: 'mint',
-      args: this.spec.funcArgsToScVals("mint", { to }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async transfer({ from, to, id }: any, options = {}) {
-    const res = await invoke({
-      method: 'transfer',
-      args: this.spec.funcArgsToScVals("transfer", { from, to, id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async transferFrom({ operator, from, to, id }: any, options = {}) {
-    const res = await invoke({
-      method: 'transfer_from',
-      args: this.spec.funcArgsToScVals("transfer_from", { operator, from, to, id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async burn({ from, id }: any, options = {}) {
-    const res = await invoke({
-      method: 'burn',
-      args: this.spec.funcArgsToScVals("burn", { from, id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async burnFrom({ operator, from, id }: any, options = {}) {
-    const res = await invoke({
-      method: 'burn_from',
-      args: this.spec.funcArgsToScVals("burn_from", { operator, from, id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: () => { },
-    });
-    return res
-  }
-  async admin(options = {}) {
-    const res = await invoke({
-      method: 'admin',
-      args: this.spec.funcArgsToScVals("admin", {}),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("admin", xdr);
-      },
-    });
-    return res
-  }
-  async balance({ id }: any, options = {}) {
-    const res = await invoke({
-      method: 'balance',
-      args: this.spec.funcArgsToScVals("balance", { id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("balance", xdr);
-      },
-    });
-    return res
-  }
-  async name(options = {}) {
-    const res = await invoke({
-      method: 'name',
-      args: this.spec.funcArgsToScVals("name", {}),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("name", xdr);
-      },
-    });
-    return res
-  }
-  async operator({ owner }: any, options = {}) {
-    const res = await invoke({
-      method: 'operator',
-      args: this.spec.funcArgsToScVals("operator", { owner }),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("operator", xdr);
-      },
-    });
-    return res
-  }
-  async owner({ id }: any, options = {}) {
-    const res = await invoke({
-      method: 'owner',
-      args: this.spec.funcArgsToScVals("owner", { id }),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("owner", xdr);
-      },
-    });
-    return res
-  }
-  async supply(options = {}) {
-    const res = await invoke({
-      method: 'supply',
-      args: this.spec.funcArgsToScVals("supply", {}),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("supply", xdr);
-      },
-    });
-    return res
-  }
-  async symbol(options = {}) {
-    const res = await invoke({
-      method: 'symbol',
-      args: this.spec.funcArgsToScVals("symbol", {}),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("symbol", xdr);
-      },
-    });
-    return res
-  }
-  async tokenUri(options = {}) {
-    const res = await invoke({
-      method: 'token_uri',
-      args: this.spec.funcArgsToScVals("token_uri", {}),
-      ...options,
-      ...this.options,
-      parseResultXdr: (xdr: any) => {
-        return this.spec.funcResToNative("token_uri", xdr);
-      },
-    });
-    return res
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+//---- SUBMIT TX
+
+const RPC_SERVER = "https://rpc-futurenet.stellar.org:443";
+//const RPC_SERVER = "https://soroban-testnet.stellar.org/";
+const server = new SorobanRpc.Server(RPC_SERVER);
+
+/*
+// Submits a tx and then polls for its status until a timeout is reached.
+async function submitTx2(tx){
+  return server.sendTransaction(tx).then(async (reply) => {
+    if (reply.status !== "PENDING") {
+      throw reply;
+    }
+
+    let status;
+    let attempts = 0;
+    while (attempts++ < 5) {
+      const tmpStatus = await server.getTransaction(reply.hash);
+      switch (tmpStatus.status) {
+        case "FAILED":
+          throw tmpStatus;
+        case "NOT_FOUND":
+          await sleep(500);
+          continue;
+        case "SUCCESS":
+          status = tmpStatus;
+          break;
+      }
+    }
+
+    if (attempts >= 5 || !status) {
+      throw new Error(`Failed to find transaction ${reply.hash} in time.`);
+    }
+
+    return status;
+  });
+}
+*/
+
+async function submitTx(tx: Transaction) {
+  try {
+    let response = await server.sendTransaction(tx);
+    console.log(`Sent transaction: ${JSON.stringify(response)}`);
+    let txid = response.hash;
+
+    if (response.status === "PENDING") {
+      let result = await server.getTransaction(response.hash);
+      // Poll `getTransaction` until the status is not "NOT_FOUND"
+      while (result.status === "NOT_FOUND") {
+        console.log("Waiting for transaction confirmation...");
+        // See if the transaction is complete
+        result = await server.getTransaction(response.hash);
+        // Wait one second
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      //console.log(`getTransaction response: ${JSON.stringify(result)}`);
+      console.log(`Status:`, result.status);
+      if (result.status === "SUCCESS") {
+        // Make sure the transaction's resultMetaXDR is not empty
+        if (!result.resultMetaXdr) {
+          throw "Empty resultMetaXDR in getTransaction response";
+        }
+        // Find the return value from the contract and return it
+        let transactionMeta = result.resultMetaXdr;
+        let returnValue = result.returnValue;
+        console.log("Return value:", JSON.stringify(returnValue, null, 2));
+        //console.log(`Return value: ${returnValue}`);
+        return {
+          success: true,
+          value: returnValue,
+          meta: transactionMeta,
+          txid,
+        };
+      } else {
+        console.log("XDR:", JSON.stringify(result.resultXdr, null, 2));
+        throw `Transaction failed: ${result.resultXdr}`;
+      }
+    } else {
+      throw response.errorResult;
+    }
+  } catch (err: any) {
+    // Catch and report any errors we've thrown
+    console.log("Sending transaction failed");
+    console.log(err);
+    console.log(JSON.stringify(err));
+    return { success: false, error: err.message };
   }
 }
 
+//---- RESTORE
+
+// assume that `server` is the Server() instance from the preamble
+async function submitOrRestoreAndRetry(signer: Keypair, tx: Transaction) {
+  // We can't use `prepareTransaction` here because we want to do
+  // restoration if necessary, basically assembling the simulation ourselves.
+  const sim = await server.simulateTransaction(tx);
+
+  // Other failures are out of scope of this tutorial.
+  if (!Api.isSimulationSuccess(sim)) {
+    throw sim;
+  }
+
+  // If simulation didn't fail, we don't need to restore anything! Just send it.
+  if (!Api.isSimulationRestore(sim)) {
+    console.log("No contract restore needed");
+    //const prepTx = assembleTransaction(tx, sim);
+    //console.log(prepTx)
+    //prepTx.sign(signer);
+
+    let prepTx = await server.prepareTransaction(tx);
+    console.log(prepTx);
+    prepTx.sign(signer);
+
+    const rest = await submitTx(prepTx);
+    //console.log(rest)
+    return rest;
+  }
+
+  //
+  // Build the restoration operation using the RPC server's hints.
+  //
+  console.log("Restore Contract...");
+  const account = await server.getAccount(signer.publicKey());
+  let fee = parseInt(BASE_FEE);
+  fee += parseInt(sim.restorePreamble.minResourceFee);
+
+  const restoreTx = new TransactionBuilder(account, { fee: fee.toString() })
+    .setNetworkPassphrase(Networks.FUTURENET)
+    .setSorobanData(sim.restorePreamble.transactionData.build())
+    .addOperation(Operation.restoreFootprint({}))
+    .setTimeout(30)
+    .build();
+
+  restoreTx.sign(signer);
+
+  const resp = await submitTx(restoreTx);
+  console.log({ resp });
+  //if (resp?.status !== Api.GetTransactionStatus.SUCCESS) {
+  if (!resp?.success) {
+    //throw resp;
+    console.log("Error restoring contract", resp);
+    return { success: false, error: "Error restoring contract" };
+  }
+
+  //
+  // now that we've restored the necessary data, we can retry our tx using
+  // the initial data from the simulation (which, hopefully, is still
+  // up-to-date)
+  //
+  const retryTxBuilder = TransactionBuilder.cloneFrom(tx, {
+    fee: (parseInt(tx.fee) + parseInt(sim.minResourceFee)).toString(),
+    sorobanData: sim.transactionData.build(),
+  });
+
+  // because we consumed a sequence number when restoring, we need to make sure we set the correct value on this copy
+  // @ts-ignore: types suck donkey balls
+  retryTxBuilder?.source?.incrementSequenceNumber();
+
+  const retryTx = retryTxBuilder.build();
+  retryTx.sign(signer);
+
+  const resx = await submitTx(retryTx);
+  console.log("Restored?", resx);
+  return resx;
+}
+
+//---- RESTORE
+
+async function restoreContract(signer: Keypair, c: Contract) {
+  const instance = c.getFootprint();
+  const account = await server.getAccount(signer.publicKey());
+  const wasmEntry = await server.getLedgerEntries(getWasmLedgerKey(instance));
+  // @ts-ignore: types suck donkey balls
+  const data = new SorobanDataBuilder()
+    .setReadWrite([instance, wasmEntry])
+    .build();
+  const restoreTx = new TransactionBuilder(account, { fee: BASE_FEE })
+    .setNetworkPassphrase(Networks.FUTURENET)
+    .setSorobanData(data) // Set the restoration footprint (remember, it should be in the read-write part!)
+    .addOperation(Operation.restoreFootprint({}))
+    .build();
+
+  const preppedTx = await server.prepareTransaction(restoreTx);
+  preppedTx.sign(signer);
+  return submitTx(preppedTx);
+}
+
+function getWasmLedgerKey(entry: any) {
+  const hash = entry.val().instance().wasmHash();
+  const key = { hash };
+  const code = new xdr.LedgerKeyContractCode(key);
+  const res = xdr.LedgerKey.contractCode(code);
+  return res;
+}
+
+//---- RUN
+
+export async function submit(
+  network: any,
+  secret: string,
+  contractId: string,
+  method: string,
+  args: any,
+) {
+  const source = Keypair.fromSecret(secret);
+  const server = new SorobanRpc.Server(network.rpcUrl);
+  const contract = new Contract(contractId);
+  const account = await server.getAccount(source.publicKey());
+  console.log({ network, contractId, method, args });
+
+  let op = contract.call(method, ...args);
+  let tx = new TransactionBuilder(account, {
+    fee: BASE_FEE,
+    networkPassphrase: network.networkPassphrase,
+  })
+    .addOperation(op)
+    .setTimeout(30)
+    .build();
+
+  try {
+    const resp = await submitOrRestoreAndRetry(source, tx);
+    console.log("RESP", resp);
+    if (resp.success) {
+      const meta: any = resp.meta;
+      //console.log('META', JSON.stringify(meta,null,2))
+      const lastId =
+        meta?._value?._attributes?.sorobanMeta?._attributes?.events[0]?._attributes?.body?._value?._attributes?.data?._value?._attributes?.lo?._value?.toString() ||
+        "";
+      const tokenId = lastId ? contractId + " #" + lastId : resp.txid;
+      console.log("TOKENID", tokenId);
+      return { success: true, tokenId, error: null };
+    } else {
+      return { success: false, tokenId: "", error: "Error minting NFT" };
+    }
+  } catch (err: any) {
+    // Catch and report any errors we've thrown
+    console.log("Error sending transaction", err);
+    return {
+      success: false,
+      tokenId: "",
+      error: err.message || "Error minting NFT",
+    };
+  }
+}

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Wallet from "../../Wallets/freighter"; // TODO: Placeholder for actual wallet import
 import Stellar from "./common";
@@ -6,53 +6,58 @@ import Stellar from "./common";
 type Dictionary = { [key: string]: any };
 
 interface StellarOptions {
-  network?: 'mainnet' | 'testnet'
+  network?: "mainnet" | "testnet";
 }
 
 class StellarClient extends Stellar {
-  constructor({ network = 'mainnet' } = {} as StellarOptions) {
+  constructor({ network = "mainnet" } = {} as StellarOptions) {
     super();
     this.network = network;
-    this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
+    this.provider = network === "mainnet" ? this.mainnet : this.testnet;
     this.wallet = new Wallet();
   }
 
   async connect(callback: (options: Record<string, any>) => void) {
-    console.log('XLM Connecting...')
-    const result = await this.wallet.connect()
-    console.log('Freighter session:', result)
+    console.log("XLM Connecting...");
+    const result = await this.wallet.connect();
+    console.log("Freighter session:", result);
     if (result) {
-      const address = result.account
-      const network = result.network
-      const topic = '' //result.topic
+      const address = result.account;
+      const network = result.network;
+      const topic = ""; //result.topic
       const data = {
-        wallet: 'freighter',
+        wallet: "freighter",
         address: address,
         chain: this.chain,
-        chaindid: '',
+        chaindid: "",
         currency: this.symbol,
         network: network,
-        token: '',
-        topic: topic
-      }
-      callback(data)
+        token: "",
+        topic: topic,
+      };
+      callback(data);
     }
   }
 
-  async sendPayment(address: string, amount: number, destinTag: string, callback: (data: Dictionary) => void) {
-    console.log(this.chain, 'Sending payment to', address, amount)
-    const connect = await this.wallet.connect()
-    console.log('Wallet restored...', connect)
-    const source = connect?.account
-    console.log('SOURCE', source)
+  async sendPayment(
+    address: string,
+    amount: number,
+    destinTag: string,
+    callback: (data: Dictionary) => void,
+  ) {
+    console.log(this.chain, "Sending payment to", address, amount);
+    const connect = await this.wallet.connect();
+    console.log("Wallet restored...", connect);
+    const source = connect?.account;
+    console.log("SOURCE", source);
     if (!source) {
-      console.log('Error: Signature rejected by user')
-      callback({ success: false, error: 'Signature rejected by user' })
-      return
+      console.log("Error: Signature rejected by user");
+      callback({ success: false, error: "Signature rejected by user" });
+      return;
     }
-    const currency = this.symbol
-    const issuer = ''
-    const memo = destinTag ? 'tag:' + destinTag : ''
+    const currency = this.symbol;
+    const issuer = "";
+    const memo = destinTag ? "tag:" + destinTag : "";
     //const {txid, xdr} = await this.paymentXDR(source, address, amount, currency, issuer, memo)
     //console.log('txid', txid)
     //this.wallet.signAndSubmit(xdr, async result=>{
@@ -65,8 +70,8 @@ class StellarClient extends Stellar {
     //  console.log('Result', result)
     //  callback({success:true, txid})
     //})
-    const result = await this.wallet.payment(address, amount, memo)
-    callback(result)
+    const result = await this.wallet.payment(address, amount, memo);
+    callback(result);
   }
 
   /*

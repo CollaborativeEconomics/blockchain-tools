@@ -1,95 +1,129 @@
-import { Wallet, Client, convertStringToHex, NFTokenMintFlags, isoTimeToRippleTime, NFTokenCreateOfferFlags, NFTokenCreateOffer, Transaction, TransactionMetadata } from 'xrpl'
+import {
+  Wallet,
+  Client,
+  convertStringToHex,
+  NFTokenMintFlags,
+  isoTimeToRippleTime,
+  NFTokenCreateOfferFlags,
+  NFTokenCreateOffer,
+  Transaction,
+  TransactionMetadata,
+} from "xrpl";
 import Xrpl from "./common";
 
 class XrplServer extends Xrpl {
   walletSeed: string;
   sourceTag?: number;
 
-  constructor({ network, sourceTag, walletSeed } = { network: 'mainnet', sourceTag: 0, walletSeed: '' }) {
-    super()
-    this.network = network
-    this.walletSeed = walletSeed
-    this.sourceTag = sourceTag
-    this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
+  constructor(
+    { network, sourceTag, walletSeed } = {
+      network: "mainnet",
+      sourceTag: 0,
+      walletSeed: "",
+    },
+  ) {
+    super();
+    this.network = network;
+    this.walletSeed = walletSeed;
+    this.sourceTag = sourceTag;
+    this.provider = this.network === "mainnet" ? this.mainnet : this.testnet;
   }
 
-  async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
-    console.log('XRP Minting NFT...', uri, donor)
-    let client = null
-    if (!taxon) { taxon = 123456000 }
+  async mintNFT(
+    uri: string,
+    donor: string,
+    taxon: number,
+    transfer: boolean = false,
+  ) {
+    console.log("XRP Minting NFT...", uri, donor);
+    let client = null;
+    if (!taxon) {
+      taxon = 123456000;
+    }
     try {
-      let wallet = Wallet.fromSeed(this.walletSeed)
-      let account = wallet.classicAddress
-      console.log('ADDRESS', account)
-      let nftUri = convertStringToHex(uri)
-      let flags = NFTokenMintFlags.tfBurnable + NFTokenMintFlags.tfOnlyXRP
-      if (transfer) { flags += NFTokenMintFlags.tfTransferable }
-      let tx: Transaction = {
-        TransactionType: 'NFTokenMint',
-        Account: account,
-        URI: nftUri,          // uri to metadata
-        NFTokenTaxon: taxon,  // id for all nfts minted by us
-        Flags: flags,         // burnable, onlyXRP, non transferable
-        SourceTag: this.sourceTag, // 77777777
+      let wallet = Wallet.fromSeed(this.walletSeed);
+      let account = wallet.classicAddress;
+      console.log("ADDRESS", account);
+      let nftUri = convertStringToHex(uri);
+      let flags = NFTokenMintFlags.tfBurnable + NFTokenMintFlags.tfOnlyXRP;
+      if (transfer) {
+        flags += NFTokenMintFlags.tfTransferable;
       }
+      let tx: Transaction = {
+        TransactionType: "NFTokenMint",
+        Account: account,
+        URI: nftUri, // uri to metadata
+        NFTokenTaxon: taxon, // id for all nfts minted by us
+        Flags: flags, // burnable, onlyXRP, non transferable
+        SourceTag: this.sourceTag, // 77777777
+      };
       //if(destinTag){ tx.DestinationTag = destinTag }
-      console.log('TX', tx)
-      client = new Client(this.provider.wssurl || '')
-      await client.connect()
-      let txInfo = await client.submitAndWait(tx, { wallet })
-      const txRes = (txInfo?.result?.meta as TransactionMetadata).TransactionResult
-      console.log('Result:', txRes)
-      if (txRes == 'tesSUCCESS') {
+      console.log("TX", tx);
+      client = new Client(this.provider.wssurl || "");
+      await client.connect();
+      let txInfo = await client.submitAndWait(tx, { wallet });
+      const txRes = (txInfo?.result?.meta as TransactionMetadata)
+        .TransactionResult;
+      console.log("Result:", txRes);
+      if (txRes == "tesSUCCESS") {
         //console.log('TXINFO', JSON.stringify(txInfo))
-        let tokenId = this.findToken(txInfo)
-        console.log('TokenId:', tokenId)
-        return { success: true, tokenId }
+        let tokenId = this.findToken(txInfo);
+        console.log("TokenId:", tokenId);
+        return { success: true, tokenId };
       }
     } catch (ex: any) {
-      console.error(ex)
-      return { success: false, error: 'Error minting NFT: ' + ex?.message || 'unknown' }
+      console.error(ex);
+      return {
+        success: false,
+        error: "Error minting NFT: " + ex?.message || "unknown",
+      };
     } finally {
-      client?.disconnect()
+      client?.disconnect();
     }
   }
 
-  async createSellOffer(tokenId: string, destinationAddress: string, offerExpirationDate?: string) {
-    console.log('XRP Sell offer', tokenId, destinationAddress)
-    let client = null
+  async createSellOffer(
+    tokenId: string,
+    destinationAddress: string,
+    offerExpirationDate?: string,
+  ) {
+    console.log("XRP Sell offer", tokenId, destinationAddress);
+    let client = null;
     try {
-      let wallet = Wallet.fromSeed(this.walletSeed)
-      let account = wallet.classicAddress
-      console.log('ACT', account)
+      let wallet = Wallet.fromSeed(this.walletSeed);
+      let account = wallet.classicAddress;
+      console.log("ACT", account);
       let tx: Transaction = {
-        TransactionType: 'NFTokenCreateOffer',
+        TransactionType: "NFTokenCreateOffer",
         Account: account,
         NFTokenID: tokenId,
         Destination: destinationAddress,
-        Amount: '0',  // Zero price as it is a transfer
-        Flags: NFTokenCreateOfferFlags.tfSellNFToken // sell offer
-      } as NFTokenCreateOffer
+        Amount: "0", // Zero price as it is a transfer
+        Flags: NFTokenCreateOfferFlags.tfSellNFToken, // sell offer
+      } as NFTokenCreateOffer;
       if (offerExpirationDate) {
-        tx.Expiration = isoTimeToRippleTime(offerExpirationDate) // must be Ripple epoch
+        tx.Expiration = isoTimeToRippleTime(offerExpirationDate); // must be Ripple epoch
       }
-      console.log('TX', tx)
-      console.log('WSS', this.provider.wssurl)
-      client = new Client(this.provider.wssurl || '')
-      await client.connect()
-      let txInfo = await client.submitAndWait(tx, { wallet })
-      const txRes = (txInfo?.result?.meta as TransactionMetadata).TransactionResult
-      console.log('Result:', txRes)
-      if (txRes == 'tesSUCCESS') {
-        let offerId = this.findOffer(txInfo)
-        console.log('OfferId', offerId)
-        return { success: true, offerId }
+      console.log("TX", tx);
+      console.log("WSS", this.provider.wssurl);
+      client = new Client(this.provider.wssurl || "");
+      await client.connect();
+      let txInfo = await client.submitAndWait(tx, { wallet });
+      const txRes = (txInfo?.result?.meta as TransactionMetadata)
+        .TransactionResult;
+      console.log("Result:", txRes);
+      if (txRes == "tesSUCCESS") {
+        let offerId = this.findOffer(txInfo);
+        console.log("OfferId", offerId);
+        return { success: true, offerId };
       } else {
-        return { error: 'Failure creating sell offer' }
+        return { error: "Failure creating sell offer" };
       }
     } catch (ex) {
-      console.error(ex)
-      return { error: 'Error creating sell offer' }
+      console.error(ex);
+      return { error: "Error creating sell offer" };
     } finally {
-      client?.disconnect()
+      client?.disconnect();
     }
   }
 

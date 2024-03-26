@@ -1,42 +1,57 @@
-import { Contract, Networks } from '../../Contracts/nft721'
+import { Contract, Networks } from "../../Contracts/nft721";
 import Stellar, { StellarNetworks } from "./common";
 
 class StellarServer extends Stellar {
   walletSeed: string;
   contract: string;
 
-  constructor({ network, contract, walletSeed } = { network: 'mainnet' as StellarNetworks, contract: '', walletSeed: '' }) {
-    super()
-    this.network = network
-    this.walletSeed = walletSeed
-    this.contract = contract
-    this.provider = this.network === 'mainnet' ? this.mainnet : this.testnet
+  constructor(
+    { network, contract, walletSeed } = {
+      network: "mainnet" as StellarNetworks,
+      contract: "",
+      walletSeed: "",
+    },
+  ) {
+    super();
+    this.network = network;
+    this.walletSeed = walletSeed;
+    this.contract = contract;
+    this.provider = this.network === "mainnet" ? this.mainnet : this.testnet;
   }
 
-  async mintNFT(uri: string, donor: string, taxon: number, transfer: boolean = false) {
-    console.log(this.chain, 'minting NFT to', donor, uri)
+  async mintNFT(
+    uri: string,
+    donor: string,
+    taxon: number,
+    transfer: boolean = false,
+  ) {
+    console.log(this.chain, "minting NFT to", donor, uri);
     // const network = this.network == 'futurenet' ? this.futurenet : this.testnet
     const contractConfigMap = {
       futurenet: { ...Networks.futurenet, walletSeed: this.walletSeed },
       testnet: { ...Networks.testnet, walletSeed: this.walletSeed },
       mainnet: { ...Networks.futurenet, walletSeed: this.walletSeed }, // TODO: Add mainnet config
-    }
+    };
     // console.log('NET', network)
     // TODO: take out the hardcoded contracts
-    const contract = new Contract(contractConfigMap[this.network])
+    const contract = new Contract(contractConfigMap[this.network]);
     //console.log('CTR', contract.spec)
-    const info = await contract.mint({ to: donor })
-    console.log('OK?', info?.success)
-    console.log('TXID', info?.txid)
-    console.log('TKID', info?.tokenId)
+    const info = await contract.mint({ to: donor });
+    console.log("OK?", info?.success);
+    console.log("TXID", info?.txid);
+    console.log("TKID", info?.tokenId);
     if (!info?.success) {
-      return info
+      return info;
     }
-    return info
+    return info;
   }
 
-  async createSellOffer(tokenId: string, destinationAddress: string, offerExpirationDate?: string) {
-    console.log('Creating sell offer', tokenId, destinationAddress);
+  async createSellOffer(
+    tokenId: string,
+    destinationAddress: string,
+    offerExpirationDate?: string,
+  ) {
+    console.log("Creating sell offer", tokenId, destinationAddress);
     // TODO: Implementation for creating a sell offer
     throw new Error("createSellOffer method not implemented.");
   }

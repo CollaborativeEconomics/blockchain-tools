@@ -2,48 +2,48 @@ import ChainInstance, { Chain, ChainSymbol } from "../ChainInstance";
 
 export const mainnetConfig = {
   id: 50,
-  name: 'Mainnet',
-  symbol: 'XDC',
+  name: "Mainnet",
+  symbol: "XDC",
   decimals: 18,
-  gasprice: '250000000',
-  explorer: 'https://explorer.xinfin.network',
-  rpcurl: 'https://rpc.xinfin.network',
-  wssurl: '{MAINNET_WSS_URL}'
+  gasprice: "250000000",
+  explorer: "https://explorer.xinfin.network",
+  rpcurl: "https://rpc.xinfin.network",
+  wssurl: "{MAINNET_WSS_URL}",
 };
 
 export const testnetConfig = {
   id: 51,
-  name: 'Testnet',
-  symbol: 'TXDC',
+  name: "Testnet",
+  symbol: "TXDC",
   decimals: 18,
-  gasprice: '250000000',
-  explorer: 'https://explorer.apothem.network',
-  rpcurl: 'https://rpc.apothem.network',
-  wssurl: '{TESTNET_WSS_URL}'
+  gasprice: "250000000",
+  explorer: "https://explorer.apothem.network",
+  rpcurl: "https://rpc.apothem.network",
+  wssurl: "{TESTNET_WSS_URL}",
 };
 
 interface XinFinOptions {
-  network?: 'mainnet' | 'testnet'
+  network?: "mainnet" | "testnet";
 }
 
 class XinFin extends ChainInstance {
-  chain: Chain = 'XinFin';
-  symbol: ChainSymbol = 'XDC';
-  logo = 'xdc.svg';
+  chain: Chain = "XinFin";
+  symbol: ChainSymbol = "XDC";
+  logo = "xdc.svg";
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 
-  constructor({ network = 'mainnet' } = {} as XinFinOptions) {
+  constructor({ network = "mainnet" } = {} as XinFinOptions) {
     super();
     this.network = network;
-    this.provider = network === 'mainnet' ? this.mainnet : this.testnet;
+    this.provider = network === "mainnet" ? this.mainnet : this.testnet;
   }
 
   async getTransactionInfo(txid: string): Promise<unknown> {
-    console.log('Get tx info', txid)
-    const info = await this.fetchLedger('eth_getTransactionByHash', [txid])
+    console.log("Get tx info", txid);
+    const info = await this.fetchLedger("eth_getTransactionByHash", [txid]);
     if (!info || info?.error) {
-      return { success: false, error: 'Error fetching tx info' }
+      return { success: false, error: "Error fetching tx info" };
     }
     const result = {
       success: true,
@@ -51,53 +51,62 @@ class XinFin extends ChainInstance {
       destination: this.addressToHex(info?.to),
       destinationTag: this.hexToStr(info?.input),
       amount: this.fromBaseUnit(info?.value),
-    }
-    return result
-
+    };
+    return result;
   }
 
   async fetchLedger(method: string, params: unknown) {
-    let data = { id: '1', jsonrpc: '2.0', method, params }
-    let body = JSON.stringify(data)
-    let opt = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }
+    let data = { id: "1", jsonrpc: "2.0", method, params };
+    let body = JSON.stringify(data);
+    let opt = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+    };
     try {
-      let res = await fetch(this.provider.rpcurl, opt)
-      let inf = await res.json()
-      return inf?.result
+      let res = await fetch(this.provider.rpcurl, opt);
+      let inf = await res.json();
+      return inf?.result;
     } catch (ex: any) {
-      console.error(ex)
-      return { error: ex.message }
+      console.error(ex);
+      return { error: ex.message };
     }
   }
 
   addressToHex(adr: string) {
-    if (!adr) return null
-    return '0x' + adr.substr(3)
+    if (!adr) return null;
+    return "0x" + adr.substr(3);
   }
 
-  hexToStr(hex: string, encoding: BufferEncoding = 'utf8') {
-    if (!hex) { return '' }
-    return Buffer.from(hex.substr(2), 'hex').toString(encoding)
+  hexToStr(hex: string, encoding: BufferEncoding = "utf8") {
+    if (!hex) {
+      return "";
+    }
+    return Buffer.from(hex.substr(2), "hex").toString(encoding);
   }
 
   strToBytes(str: string) {
-    if (!str) { return '' }
-    const hex = Buffer.from(str.toString(), 'utf8')
+    if (!str) {
+      return "";
+    }
+    const hex = Buffer.from(str.toString(), "utf8");
     //const hex = '0x'+Buffer.from(str.toString(), 'utf8').toString('hex')
-    return hex
+    return hex;
   }
 
   strToHex(str: string) {
-    if (!str) { return '' }
-    return '0x' + Buffer.from(str.toString(), 'utf8').toString('hex')
+    if (!str) {
+      return "";
+    }
+    return "0x" + Buffer.from(str.toString(), "utf8").toString("hex");
   }
 
   addressToXdc(adr: string) {
-    if (!adr) return null
-    return 'xdc' + adr.substr(2)
+    if (!adr) return null;
+    return "xdc" + adr.substr(2);
   }
 
   // TODO: Additional common methods specific to this blockchain
-};
+}
 
 export default XinFin;
