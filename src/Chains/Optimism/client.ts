@@ -1,6 +1,6 @@
 "use client";
 
-import Wallet from "@/Wallets/metamask";
+import Wallet from "@/wallets/metamask";
 import Optimism from "./common";
 
 class OptimismClient extends Optimism {

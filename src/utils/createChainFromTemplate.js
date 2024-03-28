@@ -8,8 +8,8 @@ const rl = readline.createInterface({
 });
 
 rl.question("Enter the name of the chain (e.g., Xrpl): ", async (chainName) => {
-  const templateFolder = "src/Chains/Template";
-  const newFolder = `src/Chains/${chainName}`;
+  const templateFolder = "src/chains/Template";
+  const newFolder = `src/chains/${chainName}`;
   const filesToProcess = ["common.txt", "server.txt", "client.txt"];
 
   fs.cpSync(templateFolder, newFolder, { recursive: true });

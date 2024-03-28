@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import Abi721 from "@/Contracts/erc721-abi.json";
+import Abi721 from "@/contracts/erc721-abi.json";
 import Arbitrum from "./common";
 
 class ArbitrumServer extends Arbitrum {

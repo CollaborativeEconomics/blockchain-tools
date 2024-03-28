@@ -1,5 +1,5 @@
 import { get } from "lodash";
-import ChainInstance, { Chain, ChainSymbol } from "@/Chains/ChainInstance";
+import ChainInstance, { Chain, ChainSymbol } from "@/chains/ChainInstance";
 import {
   NFTokenCreateOffer,
   NFTokenMint,

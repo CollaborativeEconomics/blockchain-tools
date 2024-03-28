@@ -1,4 +1,4 @@
-import ChainInstance, { Chain, ChainSymbol } from "@/Chains/ChainInstance";
+import ChainInstance, { Chain, ChainSymbol } from "@/chains/ChainInstance";
 import { NetworkProvider } from "@/types/networkProvider";
 
 export const mainnetConfig = {

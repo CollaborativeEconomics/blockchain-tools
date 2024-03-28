@@ -1,6 +1,6 @@
 "use client";
 
-import Wallet from "@/Wallets/metamask";
+import Wallet from "@/wallets/metamask";
 import EthereumClient from "./client";
 import { Chain, ChainSymbol } from "../ChainInstance";
 

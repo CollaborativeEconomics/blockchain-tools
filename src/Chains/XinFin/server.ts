@@ -1,7 +1,7 @@
 import { Web3 } from "web3";
 
-import Abi1155 from "../../Contracts/erc1155-abi.json";
-import Abi721 from "../../Contracts/erc721-abi.json";
+import Abi1155 from "../../contracts/erc1155-abi.json";
+import Abi721 from "../../contracts/erc721-abi.json";
 import XinFin from "./common";
 
 class XinFinServer extends XinFin {

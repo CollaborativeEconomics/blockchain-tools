@@ -1,6 +1,6 @@
 "use client";
 
-import Wallet from "@/Wallets/metamask";
+import Wallet from "@/wallets/metamask";
 import Arbitrum from "./common";
 
 class ArbitrumClient extends Arbitrum {

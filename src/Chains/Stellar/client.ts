@@ -1,6 +1,6 @@
 "use client";
 
-import Wallet from "../../Wallets/freighter"; // TODO: Placeholder for actual wallet import
+import Wallet from "../../wallets/freighter"; // TODO: Placeholder for actual wallet import
 import Stellar from "./common";
 
 type Dictionary = { [key: string]: any };

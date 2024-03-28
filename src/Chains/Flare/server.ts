@@ -1,6 +1,6 @@
 import Web3 from "web3";
 
-import Abi721 from "@/Contracts/erc721-abi.json";
+import Abi721 from "@/contracts/erc721-abi.json";
 import Flare from "./common";
 
 class FlareServer extends Flare {

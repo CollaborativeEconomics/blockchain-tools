@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import erc20abi from "../Contracts/erc20-abi.json";
+import erc20abi from "../contracts/erc20-abi.json";
 import { NetworkProvider } from "@/types/networkProvider";
 
 export default class Wallet {
