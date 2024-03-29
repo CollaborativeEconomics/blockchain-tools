@@ -3,13 +3,6 @@
   "version": "0.2.10",
   "description": "Common tools for interacting with diverse blockchains. Used in the CFCE ecosystem.",
   "main": "dist/index.js",
-  "exports": {
-    ".": "./dist/index.js",
-    "./utils": "./dist/utils/index.js",
-    "./chains": "./dist/chains/index.js",
-    "./contracts": "./dist/contracts/index.js",
-    "./wallets": "./dist/wallets/index.js"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
