@@ -8,7 +8,7 @@ export const mainnetConfig = {
   gasprice: "250000000",
   explorer: "https://explorer.xinfin.network",
   rpcurl: "https://rpc.xinfin.network",
-  wssurl: "{MAINNET_WSS_URL}",
+  wssurl: "",
 };
 
 export const testnetConfig = {
@@ -19,12 +19,8 @@ export const testnetConfig = {
   gasprice: "250000000",
   explorer: "https://explorer.apothem.network",
   rpcurl: "https://rpc.apothem.network",
-  wssurl: "{TESTNET_WSS_URL}",
+  wssurl: "",
 };
-
-interface XinFinOptions {
-  network?: "mainnet" | "testnet";
-}
 
 class XinFin extends ChainInstance {
   chain: Chain = "XinFin";
@@ -33,7 +29,7 @@ class XinFin extends ChainInstance {
   mainnet = mainnetConfig;
   testnet = testnetConfig;
 
-  constructor({ network = "mainnet" } = {} as XinFinOptions) {
+  constructor({ network = "mainnet" } = {}) {
     super();
     this.network = network;
     this.provider = network === "mainnet" ? this.mainnet : this.testnet;

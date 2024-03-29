@@ -8,7 +8,7 @@ export const mainnetConfig = {
   gasprice: "25000000000",
   explorer: "https://flare-explorer.flare.net",
   rpcurl: "https://songbird.towolabs.com/rpc",
-  wssurl: "{MAINNET_WSS_URL}",
+  wssurl: "",
 };
 
 export const testnetConfig = {
@@ -19,7 +19,7 @@ export const testnetConfig = {
   gasprice: "25000000000",
   explorer: "https://coston-explorer.flare.network",
   rpcurl: "https://coston-api.flare.network/ext/bc/C/rpc",
-  wssurl: "{TESTNET_WSS_URL}",
+  wssurl: "",
 };
 
 class Flare extends ChainInstance {

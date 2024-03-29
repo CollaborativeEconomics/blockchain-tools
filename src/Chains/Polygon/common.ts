@@ -8,7 +8,7 @@ export const mainnetConfig = {
   gasprice: "2050000000",
   explorer: "https://polygonscan.com",
   rpcurl: "https://polygon-rpc.com",
-  wssurl: "{MAINNET_WSS_URL}",
+  wssurl: "",
 };
 
 export const testnetConfig = {
@@ -19,7 +19,7 @@ export const testnetConfig = {
   gasprice: "2050000000",
   explorer: "https://mumbai.polygonscan.com",
   rpcurl: "https://rpc-mumbai.maticvigil.com",
-  wssurl: "{TESTNET_WSS_URL}",
+  wssurl: "",
 };
 
 class Polygon extends ChainInstance {

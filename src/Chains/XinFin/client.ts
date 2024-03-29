@@ -5,12 +5,8 @@ import Blockchain from "./common";
 
 type Dictionary = { [key: string]: any };
 
-interface XinFinOptions {
-  network?: "mainnet" | "testnet";
-}
-
 class XinFinClient extends Blockchain {
-  constructor({ network = "mainnet" } = {} as XinFinOptions) {
+  constructor({ network = "mainnet" } = {}) {
     super();
     this.network = network;
     this.provider = network === "mainnet" ? this.mainnet : this.testnet;
