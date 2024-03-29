@@ -19,6 +19,9 @@
     "type": "git",
     "url": "git+https://github.com/CollaborativeEconomics/blockchain-tools.git"
   },
+  "files": [
+    "dist/"
+  ],
   "keywords": [
     "web3",
     "cfce",
