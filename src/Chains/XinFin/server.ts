@@ -23,7 +23,7 @@ class XinFinServer extends XinFin {
     console.log('GAS', parseInt(gasPrice, 16), gasPrice)
     const checkGas = await this.fetchLedger('eth_estimateGas', [{ from: minter, to: contract, data }])
     console.log('EST', parseInt(checkGas, 16), checkGas)
-    const gasLimit = parseInt(checkGas, 16) * 1.20
+    const gasLimit = Math.floor(parseInt(checkGas, 16) * 1.20)
     return { gasPrice, gasLimit }
   }
 
