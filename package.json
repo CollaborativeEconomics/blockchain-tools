@@ -1,6 +1,6 @@
 {
   "name": "@cfce/blockchain-tools",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "description": "Common tools for interacting with diverse blockchains. Used in the CFCE ecosystem.",
   "main": "dist/index.js",
   "scripts": {
