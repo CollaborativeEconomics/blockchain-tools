@@ -18,6 +18,15 @@ class XinFinServer extends XinFin {
     this.web3 = new Web3(this.provider.rpcurl);
   }
 
+  async getGasPrice(minter: string, contract: string, data: string) {
+    const gasPrice = await this.fetchLedger('eth_gasPrice', [])
+    console.log('GAS', parseInt(gasPrice, 16), gasPrice)
+    const checkGas = await this.fetchLedger('eth_estimateGas', [{ from: minter, to: contract, data }])
+    console.log('EST', parseInt(checkGas, 16), checkGas)
+    const gasLimit = parseInt(checkGas, 16) * 1.20
+    return { gasPrice, gasLimit }
+  }
+
   async mintNFT(
     uri: string,
     address: string,
@@ -35,23 +44,15 @@ class XinFinServer extends XinFin {
     console.log("NONCE", nonce);
     const data = instance.methods.safeMint(address, uri).encodeABI();
     console.log("DATA", data);
-    const gasHex = await this.fetchLedger("eth_gasPrice", []);
-    const gasPrice = parseInt(gasHex, 16);
-    console.log("GAS", gasPrice, gasHex);
-    const checkGas = await this.fetchLedger("eth_estimateGas", [
-      { from: minter, to: contract, data },
-    ]);
-    const gasLimit = parseInt(checkGas, 16);
-    console.log("EST", gasLimit, checkGas);
-    const gas = { gasPrice: this.provider.gasprice, gasLimit: 275000 };
+    const { gasPrice, gasLimit } = await this.getGasPrice(minter, contract, data);
 
     const tx = {
       from: minter, // minter wallet
       to: contract, // contract address
       value: "0", // this is the value in wei to send
       data: data, // encoded method and params
-      gas: gas.gasLimit,
-      gasPrice: gas.gasPrice,
+      gas: gasLimit,
+      gasPrice: gasPrice,
       nonce,
     };
     console.log("TX", tx);
@@ -99,21 +100,15 @@ class XinFinServer extends XinFin {
     const bytes = this.web3.utils.toHex(uri);
     const data = instance.methods.mint(address, tokenid, 1, bytes).encodeABI();
     console.log("DATA", data);
-    const gasPrice = await this.fetchLedger("eth_gasPrice", []);
-    console.log("GAS", parseInt(gasPrice, 16), gasPrice);
-    const checkGas = await this.fetchLedger("eth_estimateGas", [
-      { from: minter, to: contract, data },
-    ]);
-    console.log("EST", parseInt(checkGas, 16), checkGas);
-    const gas = { gasPrice: this.provider.gasprice, gasLimit: 275000 };
+    const { gasPrice, gasLimit } = await this.getGasPrice(minter, contract, data);
 
     const tx = {
       from: minter, // minter wallet
       to: contract, // contract address
       value: "0", // this is the value in wei to send
       data: data, // encoded method and params
-      gas: gas.gasLimit,
-      gasPrice: gas.gasPrice,
+      gas: gasLimit,
+      gasPrice: gasPrice,
       nonce,
     };
     console.log("TX", tx);
