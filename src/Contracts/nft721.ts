@@ -1,11 +1,5 @@
-import {
-  SorobanRpc,
-  Keypair,
-  // Contract,
-  TransactionBuilder,
-  xdr,
-  TimeoutInfinite,
-} from "@stellar/stellar-sdk";
+import { ContractSpec } from "@stellar/stellar-sdk";
+import invoke from "./invoker";
 
 const Networks = {
   futurenet: { walletSeed: '' },
@@ -13,12 +7,12 @@ const Networks = {
   mainnet: { walletSeed: '' },
 };
 
-export class Contract {
+class Contract {
   options;
   spec;
   constructor(options: any) {
     this.options = options;
-    this.spec = new SorobanClient.ContractSpec([
+    this.spec = new ContractSpec([
       "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAARuYW1lAAAAEAAAAAAAAAAGc3ltYm9sAAAAAAAQAAAAAA==",
       "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAA=",
       "AAAAAAAAAAAAAAAHYXBwcm92ZQAAAAACAAAAAAAAAAVvd25lcgAAAAAAABMAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAA=",
