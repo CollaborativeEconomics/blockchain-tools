@@ -45,18 +45,17 @@ class EthereumUSDTClient extends EthereumClient {
     callback: any,
   ) {
     console.log(this.chain, "Sending payment...");
-    this.connect(async (data) => {
-      console.log("Pay token", data);
-      //const result = await this.wallet.payment(address, amount, destinTag)
-      const result = await this.wallet.paytoken(
-        address,
-        amount,
-        this.symbol,
-        this.contract,
-        destinTag,
-      );
-      callback(result);
-    });
+    try {
+      this.connect(async (data) => {
+        console.log('Pay token', data)
+        //const result = await this.wallet.payment(address, amount, destinTag)
+        const result = await this.wallet.paytoken(address, amount, this.symbol, this.contract, destinTag)
+        callback(result)
+      })
+    } catch (ex: any) {
+      console.error(ex)
+      callback({ error: ex.message })
+    }
   }
 }
 

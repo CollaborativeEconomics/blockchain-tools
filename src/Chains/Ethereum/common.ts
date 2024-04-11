@@ -36,22 +36,16 @@ class Ethereum extends ChainInstance {
   }
 
   async getTransactionInfo(txid: string): Promise<unknown> {
-    console.log("Get tx info", txid);
-    const info = await this.fetchLedger("eth_getTransactionByHash", [txid]);
-    if (!info || info?.error) {
-      return {
-        success: false,
-        error: "Error fetching tx info",
-      };
+    try {
+      console.log('Get tx info by txid', txid)
+      const info = await this.wallet.getTransactionInfo(txid)
+      return info
+    } catch (ex) {
+      console.error(ex)
+      if (ex instanceof Error) {
+        return { error: ex.message }
+      }
     }
-    const result = {
-      success: true,
-      account: info?.from,
-      destination: info?.to,
-      destinationTag: this.hexToStr(info?.input),
-      amount: this.fromBaseUnit(info?.value),
-    };
-    return result;
   }
 
   async fetchLedger(method: string, params: unknown) {

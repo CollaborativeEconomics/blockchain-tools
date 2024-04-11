@@ -53,11 +53,15 @@ class XrplClient extends Xrpl {
           callback(data);
         } else {
           console.log("Error", state);
+          callback({ error: 'Could not connect' })
           return;
         }
       })
-      .catch((ex: any) => {
+      .catch((ex) => {
         console.log("Error", ex);
+        if (ex instanceof Error) {
+          callback({ error: ex.message });
+        }
       });
   }
 
@@ -68,63 +72,57 @@ class XrplClient extends Xrpl {
     callback: (data: Dictionary) => void,
   ) {
     console.log("XRP Sending payment...", address, amount, destinTag);
-    const request: XummJsonTransaction = {
-      TransactionType: "Payment",
-      Destination: address,
-      Amount: String(amount * 1000000), // one million drops, 1 XRP
-    };
-    if (destinTag) {
-      request.DestinationTag = destinTag;
-    }
-    //this.sendPayload(request, callback)
-    if (!this.wallet) {
-      callback({ success: false, txid: "" });
-      return;
-    }
-    this?.wallet?.payload
-      ?.createAndSubscribe(request, (event) => {
-        if (Object.keys(event.data).indexOf("opened") > -1) {
+    try {
+      const request: XummJsonTransaction = {
+        TransactionType: 'Payment',
+        Destination: address,
+        Amount: String(this.toBaseUnit(amount)) // one million drops, 1 XRP
+      }
+      if (destinTag) { request.DestinationTag = destinTag }
+      //this.sendPayload(request, callback)
+      if (!this.wallet) { callback({ success: false, txid: '' }); return }
+      this?.wallet?.payload?.createAndSubscribe(request, (event) => {
+        if (Object.keys(event.data).indexOf('opened') > -1) {
           // Update the UI? The payload was opened.
-          console.log("OPENED");
+          console.log('OPENED')
         }
-        if (Object.keys(event.data).indexOf("signed") > -1) {
+        if (Object.keys(event.data).indexOf('signed') > -1) {
           // The `signed` property is present, true (signed) / false (rejected)
-          console.log("SIGNED", event.data.signed);
-          return event;
+          console.log('SIGNED', event.data.signed)
+          return event
         }
-      })
-      .then((payload: any) => {
-        console.log("CREATED", payload);
+      }).then((payload: any) => {
+        console.log('CREATED', payload)
         // @ts-ignore: I hate types
-        console.log("Payload URL:", payload?.created.next.always);
+        console.log('Payload URL:', payload?.created.next.always)
         // @ts-ignore: I hate types
-        console.log("Payload QR:", payload?.created.refs.qr.svg);
+        console.log('Payload QR:', payload?.created.refs.qr_png)
         // @ts-ignore: I hate types
-        return payload.resolved; // Return payload promise for the next `then`
-      })
-      .then((payload: any) => {
-        console.log("RESOLVED");
-        console.log("Payload resolved", payload);
-        if (Object.keys(payload.data).indexOf("signed") > -1) {
-          const approved = payload.data.signed;
-          console.log(approved ? "APPROVED" : "REJECTED");
+        return payload.resolved // Return payload promise for the next `then`
+      }).then((payload: any) => {
+        console.log('RESOLVED')
+        console.log('Payload resolved', payload)
+        if (Object.keys(payload.data).indexOf('signed') > -1) {
+          const approved = payload.data.signed
+          console.log(approved ? 'APPROVED' : 'REJECTED')
           if (approved) {
-            callback({ success: true, txid: payload.data.txid });
+            callback({ success: true, txid: payload.data.txid })
           } else {
-            callback({ success: false, txid: "" });
+            callback({ success: false, txid: '' })
           }
         }
+      }).catch((ex: any) => {
+        console.log('ERROR', ex)
+        callback({ success: false, txid: '', error: 'Error sending payment: ' + ex })
       })
-      .catch((ex: any) => {
-        console.log("ERROR", ex);
-        callback({
-          success: false,
-          txid: "",
-          error: "Error sending payment: " + ex,
-        });
-      });
-    // This is where you can do `xumm.payload.get(...)` to fetch details
-    console.log("----DONE");
+      // This is where you can do `xumm.payload.get(...)` to fetch details
+      console.log('----DONE')
+    } catch (ex) {
+      console.error(ex)
+      if (ex instanceof Error) {
+        callback({ error: ex.message })
+      }
+    }
   }
 
   async acceptSellOffer(offerId: string, address: string, callback: any) {

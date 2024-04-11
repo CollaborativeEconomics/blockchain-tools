@@ -36,6 +36,8 @@ class StellarClient extends Stellar {
         topic: topic,
       };
       callback(data);
+    } else {
+      callback(result)
     }
   }
 
@@ -45,33 +47,39 @@ class StellarClient extends Stellar {
     destinTag: string,
     callback: (data: Dictionary) => void,
   ) {
-    console.log(this.chain, "Sending payment to", address, amount);
-    const connect = await this.wallet.connect();
-    console.log("Wallet restored...", connect);
-    const source = connect?.account;
-    console.log("SOURCE", source);
-    if (!source) {
-      console.log("Error: Signature rejected by user");
-      callback({ success: false, error: "Signature rejected by user" });
-      return;
+    try {
+      const connect = await this.wallet.connect()
+      console.log('Wallet restored...', connect)
+      const source = connect?.account
+      console.log('SOURCE', source)
+      if (!source) {
+        console.log('Error: Signature rejected by user')
+        callback({ success: false, error: 'Signature rejected by user' })
+        return
+      }
+      const currency = this.symbol
+      const issuer = ''
+      const memo = destinTag ? 'tag:' + destinTag : ''
+      //const {txid, xdr} = await this.paymentXDR(source, address, amount, currency, issuer, memo)
+      //console.log('txid', txid)
+      //this.wallet.signAndSubmit(xdr, async result=>{
+      //  console.log('UI RESULT', result)
+      //  if(result?.error){
+      //    console.log('Error', result.error)
+      //    callback({success:false, error:'Error sending payment'})
+      //    return
+      //  }
+      //  console.log('Result', result)
+      //  callback({success:true, txid})
+      //})
+      const result = await this.wallet.payment(address, amount, memo)
+      callback(result)
+    } catch (ex) {
+      console.error(ex)
+      if (ex instanceof Error) {
+        callback({ error: ex.message })
+      }
     }
-    const currency = this.symbol;
-    const issuer = "";
-    const memo = destinTag ? "tag:" + destinTag : "";
-    //const {txid, xdr} = await this.paymentXDR(source, address, amount, currency, issuer, memo)
-    //console.log('txid', txid)
-    //this.wallet.signAndSubmit(xdr, async result=>{
-    //  console.log('UI RESULT', result)
-    //  if(result?.error){
-    //    console.log('Error', result.error)
-    //    callback({success:false, error:'Error sending payment'})
-    //    return
-    //  }
-    //  console.log('Result', result)
-    //  callback({success:true, txid})
-    //})
-    const result = await this.wallet.payment(address, amount, memo);
-    callback(result);
   }
 
   /*
