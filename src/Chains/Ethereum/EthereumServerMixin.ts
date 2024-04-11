@@ -33,13 +33,7 @@ const EthereumServerMixin = (superclass: any) => class extends superclass {
     console.log("NONCE", nonce);
     const data = instance.methods.safeMint(address, uri).encodeABI();
     console.log("DATA", data);
-    const gasPrice = await this.fetchLedger("eth_gasPrice", []);
-    console.log("GAS", parseInt(gasPrice, 16), gasPrice);
-    const checkGas = await this.fetchLedger("eth_estimateGas", [
-      { from: minter, to: this.contract, data },
-    ]);
-    console.log("EST", parseInt(checkGas, 16), checkGas);
-    const gas = { gasPrice: this.provider.gasprice, gasLimit: 275000 };
+    const gas = await this.getGasPrice(minter, this.contract, data);
 
     const tx = {
       from: minter, // minter wallet
